@@ -1,11 +1,13 @@
 package com.example.android.popularmovies;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +19,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
 {
     List<PopularMovieGridItem> mItems;
+    private static final String TAG = "CustomAdapter";
 
     public GridAdapter()
     {
@@ -49,6 +52,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
         PopularMovieGridItem movielist = mItems.get(i);
         viewHolder.tvtitles.setText(movielist.getmName());
         viewHolder.imgThumbnail.setImageResource(movielist.getThumbnail());
+
     }
 
     @Override
@@ -69,6 +73,14 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
             super(itemView);
             imgThumbnail = (ImageView) itemView.findViewById(R.id.img_thumbnail);
             tvtitles = (TextView) itemView.findViewById(R.id.tv_movie_title);
+
+            
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
+                }
+            });
         }
 
 
