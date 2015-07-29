@@ -74,7 +74,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
             imgThumbnail = (ImageView) itemView.findViewById(R.id.img_thumbnail);
             tvtitles = (TextView) itemView.findViewById(R.id.tv_movie_title);
 
-            
+            /* TODO onClickListener for separate items from the adapter.*/
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
