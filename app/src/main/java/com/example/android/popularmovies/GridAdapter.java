@@ -62,6 +62,10 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
     {
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.grid_item, viewGroup, false);
+
+
+
+
         ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
     }
