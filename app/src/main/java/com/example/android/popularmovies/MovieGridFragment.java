@@ -14,6 +14,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,18 +77,76 @@ public class MovieGridFragment extends Fragment {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             FetchMovieTask movieTask = new FetchMovieTask();
-            movieTask.execute("vote_average.desc");
+            movieTask.execute("popularity");
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, Void> {
+    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getName();
+        private final String ratingMax = "10.0";
+
+        /**
+         * Prepare the movie rating for presentation.
+         */
+        private String formatRating(Float userrating) {
+
+
+            return Float.toString(userrating) + "/" + ratingMax;
+        }
+        /**
+         * Take the String representing the complete movielis in JSON Format and
+         * pull out the data we need to construct the Strings needed for the wireframes.
+         *
+         * Fortunately parsing is easy:  constructor takes the JSON string and converts it
+         * into an Object hierarchy for us.
+         */
+        private String[] getMoviesDataFromJson(String moviesdataJsonStr, int numPages)
+                throws JSONException {
+
+            // These are the names of the JSON objects that need to be extracted.
+            final String MDB_RESULTS = "results";
+            final String MDB_TITLE = "original_title";
+            final String MDB_RELEASE_DATE = "release_date";
+            final String MDB_POSTER = "poster_path";
+            final String MDB_POPULARITY = "popularity";
+            final String MDB_VOTE_AVARAGE = "vote_average";
+            final String MDB_ID = "id";
+
+            JSONObject moviesdataJson = new JSONObject(moviesdataJsonStr);
+
+            JSONArray movieArray = moviesdataJson.getJSONArray(MDB_RESULTS);
+
+            String[] resultStrs = new String[movieArray.length()];
+            Log.d(LOG_TAG, Integer.toString(movieArray.length()));
+            for(int i = 0; i < movieArray.length(); i++) {
+                String name;
+                double rating;
+                String thumbnail;
+
+                // Get the JSON object representing the movie
+                JSONObject movieObject = movieArray.getJSONObject(i);
+
+                name = movieObject.getString(MDB_TITLE);
+
+                rating = movieObject.getDouble(MDB_VOTE_AVARAGE);
+                thumbnail = movieObject.getString(MDB_POSTER);
+
+
+                resultStrs[i] = name + " - " + thumbnail + " - " + formatRating((float) rating);
+
+            }
+            for (String s : resultStrs) {
+                Log.v(LOG_TAG, "Movie entry: " + s);
+            }
+            return resultStrs;
+
+        }
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
 
             // If there is no order, there's nothing to look up. Verify size of params.
             if( params.length == 0 )
@@ -99,8 +161,11 @@ public class MovieGridFragment extends Fragment {
 
             // Will contain the raw JSON response as a string.
             String moviedbJsonStr = null;
-            //String sort_dec = ""
-            int numPages = 15;
+            String sort_desc = ".desc";
+            /* By default, the first page of results will be shown.
+            *  TheMovieDB API displays 20 results per page.
+            *  */
+            int numPages = 1;
 
 
             try {
@@ -110,14 +175,13 @@ public class MovieGridFragment extends Fragment {
                 final String MOVIE_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie";
                 final String SORT_PARAM = "sort_by";
-                //final String SORT_ORDER = ".desc";
                 final String PAGE_PARAM = "page";
                 final String KEY_PARAM = "api_key";
 
 
                 Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_PARAM, params[0])
-                        .appendQueryParameter(PAGE_PARAM,Integer.toString(numPages))
+                        .appendQueryParameter(SORT_PARAM, params[0] + sort_desc)
+                        .appendQueryParameter(PAGE_PARAM, Integer.toString(numPages))
                         .appendQueryParameter(KEY_PARAM, Constans.MOVIEDB_API_KEY)
                         .build();
 
@@ -171,6 +235,15 @@ public class MovieGridFragment extends Fragment {
                     }
                 }
             }
+
+            try{
+                return getMoviesDataFromJson(moviedbJsonStr,numPages);
+            } catch (JSONException e)
+            {
+                Log.e(LOG_TAG, e.getMessage(),e);
+                e.printStackTrace();
+            }
+
             return null;
         }
     }
