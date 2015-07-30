@@ -1,6 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +16,8 @@ import java.util.List;
 
 /**
  * Created by Raz3r on 29/07/15.
+ * The adapter for the RecyclerView.
+ * It will display a grid of thumbnails and the respective movie names.
  */
 public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
@@ -27,7 +28,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
     public GridAdapter()
     {
         super();
-        mItems = new ArrayList<PopularMovieGridItem>();
+        mItems = new ArrayList<>();
         PopularMovieGridItem movies = new PopularMovieGridItem();
 
 
