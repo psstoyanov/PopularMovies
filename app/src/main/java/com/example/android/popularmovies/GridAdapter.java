@@ -1,5 +1,7 @@
 package com.example.android.popularmovies;
 
+import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,23 +24,37 @@ import java.util.List;
 public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
 {
-    List<PopularMovieGridItem> mItems;
+    private List<PopularMovieGridItem> mItems;
+    private int itemLayout;
     private static final String TAG = "CustomAdapter";
 
     public GridAdapter()
     {
         super();
         mItems = new ArrayList<>();
-        PopularMovieGridItem movies = new PopularMovieGridItem();
 
 
         for (int i = 0; i < 15; i++)
         {
-            movies.setmName("Test " + i);
+            PopularMovieGridItem movies = new PopularMovieGridItem();
+            movies.setmName("Test " + Integer.toString(i));
             movies.setmThumbnail(R.drawable.grid_item_mock);
-            mItems.add(movies);
+            mItems.add(i, movies);
+            notifyItemInserted(i);
         }
 
+    }
+
+    public void add(PopularMovieGridItem item, int position)
+    {
+        mItems.add(position, item);
+        notifyItemInserted(position);
+    }
+    public void remove(PopularMovieGridItem item)
+    {
+        int position = mItems.indexOf(item);
+        mItems.remove(position);
+        notifyItemRemoved(position);
     }
 
     @Override
@@ -71,6 +87,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
         return mItems.size();
     }
 
+
     class ViewHolder extends RecyclerView.ViewHolder
     {
 
@@ -90,8 +107,11 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
                 @Override
                 public void onClick(View v)
                 {
+                    Context mContext = itemView.getContext();
                     Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-
+                    Intent intent = new Intent(mContext, DetailActivity.class)
+                            .putExtra(Intent.EXTRA_TEXT, "Recycler View" + getAdapterPosition());
+                    mContext.startActivity(intent);
                     Toast.makeText(itemView.getContext(),"Recycler View" + getAdapterPosition() + " clicked",Toast.LENGTH_SHORT).show();
                 }
             });
