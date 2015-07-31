@@ -32,7 +32,7 @@ public class MovieGridFragment extends Fragment {
 
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
-    RecyclerView.Adapter mAdapter;
+    GridAdapter mAdapter;
 
 
     public MovieGridFragment() {
@@ -144,6 +144,24 @@ public class MovieGridFragment extends Fragment {
             return resultStrs;
 
         }
+
+        @Override
+        protected void onPostExecute(String[] results) {
+            if(results != null)
+            {
+                for(int i = 0; i < mAdapter.getItemCount(); i++)
+                {
+                    mAdapter.clearAll();
+                    for (String movieItemStr : results)
+                    {
+                        PopularMovieGridItem newMovie = new PopularMovieGridItem();
+                        newMovie.setmName(movieItemStr);
+                        mAdapter.add(newMovie);
+                    }
+                }
+            }
+        }
+
 
         @Override
         protected String[] doInBackground(String... params) {

@@ -45,17 +45,34 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
     }
 
+
     public void add(PopularMovieGridItem item, int position)
     {
         mItems.add(position, item);
         notifyItemInserted(position);
     }
+
+    public void add(PopularMovieGridItem item)
+    {
+        int pos = mItems.size();
+        mItems.add(item);
+        notifyItemInserted(pos);
+    }
+
     public void remove(PopularMovieGridItem item)
     {
         int position = mItems.indexOf(item);
         mItems.remove(position);
         notifyItemRemoved(position);
     }
+    public void clearAll()
+    {
+        int size = mItems.size();
+        mItems.clear();
+        notifyItemRangeRemoved(0, size);
+    }
+
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
