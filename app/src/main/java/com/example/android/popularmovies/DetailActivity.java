@@ -2,14 +2,18 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.support.v7.widget.ShareActionProvider;
 import android.widget.TextView;
 
 public class DetailActivity extends AppCompatActivity
@@ -23,7 +27,7 @@ public class DetailActivity extends AppCompatActivity
         if (savedInstanceState == null)
         {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new DetailFragment())
                     .commit();
         }
     }
@@ -56,10 +60,19 @@ public class DetailActivity extends AppCompatActivity
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment
+    public static class DetailFragment extends Fragment
     {
+        /* Add the log tag
+        * */
+        private static final String LOG_TAG = DetailFragment.class.getName();
 
-        public PlaceholderFragment() {
+        private static final String MOVIE_SHARE_HASHTAG = "#PopularMovies ";
+        private String mMovieStr;
+
+        public DetailFragment()
+        {
+            setHasOptionsMenu(true);
+
         }
 
         @Override
@@ -71,10 +84,54 @@ public class DetailActivity extends AppCompatActivity
             Intent intent = getActivity().getIntent();
             if(intent != null && intent.hasExtra(Intent.EXTRA_TEXT))
             {
-                String additionalStr = intent.getStringExtra(Intent.EXTRA_TEXT);
-                ((TextView) rootView.findViewById(R.id.detail_text)).setText(additionalStr);
+                 mMovieStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+                ((TextView) rootView.findViewById(R.id.detail_text)).setText(mMovieStr);
             }
             return rootView;
         }
+
+        /* The share intent. */
+        private Intent createShareMovieIntent()
+        {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+
+            //The FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET is depricated as of API 21
+            //By the documentation FLAG_ACTIVITY NEW_DOCUMENT should be used:
+            //http://developer.android.com/reference/android/content/Intent.html
+            shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT,
+                    mMovieStr + MOVIE_SHARE_HASHTAG);
+            return shareIntent;
+        }
+
+        /* Add the options menu to the fragment. */
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+        {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            inflater.inflate(R.menu.detailfragment, menu);
+
+            // Retrieve the share menu item
+            MenuItem menuItem = menu.findItem(R.id.action_share);
+
+            // Get the provider and hold onto it to set/change the share intent.
+            ShareActionProvider mShareActioProvider =
+                    (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+            // Attach the intent to this ShareActionProvider. You can update this at any time,
+            // like when the user selects new piece of data they might like to share.
+            if(mShareActioProvider != null)
+            {
+                mShareActioProvider.setShareIntent(createShareMovieIntent());
+            }
+            else
+            {
+                Log.d(LOG_TAG, "ShareActionProvider is null???");
+            }
+
+
+        }
+
     }
 }

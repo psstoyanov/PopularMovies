@@ -276,7 +276,7 @@ public class MovieGridFragment extends Fragment {
                 moviedbJsonStr = buffer.toString();
                 Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
             } catch (IOException e) {
-                Log.e("PlaceholderFragment", "Error ", e);
+                Log.e("DetailFragment", "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;

@@ -102,7 +102,12 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
         //Use psso to load an image.
         Picasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
-        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).into(viewHolder.imgThumbnail);
+
+        //Add a fit and center function from Picasso
+        //Also changed how the view itself will handle it.
+        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.passage_wallpaper)
+                .fit().centerCrop().into(viewHolder.imgThumbnail);
+
         //Picasso.with(viewHolder.imgThumbnail.getContext()).load(R.drawable.grid_item_mock).into(viewHolder.imgThumbnail);
 
     }
@@ -129,7 +134,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
             imgThumbnail = (ImageView) itemView.findViewById(R.id.img_thumbnail);
             tvtitles = (TextView) itemView.findViewById(R.id.tv_movie_title);
 
-            /* TODO onClickListener for separate items from the adapter. Use: http://antonioleiva.com/recyclerview/*/
+            /*  onClickListener for separate items from the adapter. Use: http://antonioleiva.com/recyclerview/*/
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
