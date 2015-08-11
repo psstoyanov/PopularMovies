@@ -51,6 +51,9 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
     }
 
 
+
+
+
     public void add(PopularMovieGridItem item, int position)
     {
         mItems.add(position, item);
@@ -85,9 +88,6 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
         View v = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.grid_item, viewGroup, false);
 
-
-
-
         ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
     }
@@ -106,7 +106,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
         //Add a fit and center function from Picasso
         //Also changed how the view itself will handle it.
         Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.passage_wallpaper)
-                .fit().centerCrop().into(viewHolder.imgThumbnail);
+                .fit().centerInside().into(viewHolder.imgThumbnail);
 
         //Picasso.with(viewHolder.imgThumbnail.getContext()).load(R.drawable.grid_item_mock).into(viewHolder.imgThumbnail);
 
