@@ -33,15 +33,20 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
         super();
         mItems = new ArrayList<>();
 
+        //Initializing the adapter with an empty object.
+        PopularMovieGridItem movies = new PopularMovieGridItem();
+        mItems.add(0, movies);
+        notifyItemInserted(0);
 
-        for (int i = 0; i < 15; i++)
+
+        /*for (int i = 0; i < 15; i++)
         {
             PopularMovieGridItem movies = new PopularMovieGridItem();
             movies.setmName("Test " + Integer.toString(i));
-            movies.setmThumbnail(R.drawable.grid_item_mock);
+            movies.setmThumbnail("http://img13.deviantart.net/e8e8/i/2012/045/2/0/passage_wallpaper_by_trenchmaker-d4pp3zd.jpg");
             mItems.add(i, movies);
             notifyItemInserted(i);
-        }
+        }*/
 
     }
 
@@ -92,11 +97,12 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
     {
         PopularMovieGridItem movielist = mItems.get(i);
         viewHolder.tvtitles.setText(movielist.getmName());
-        viewHolder.imgThumbnail.setImageResource(movielist.getThumbnail());
 
-        //Use Picasso to load an image.
+        //viewHolder.imgThumbnail.setImageResource(movielist.getThumbnail());
+
+        //Use psso to load an image.
         Picasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
-        Picasso.with(viewHolder.imgThumbnail.getContext()).load("http://img13.deviantart.net/e8e8/i/2012/045/2/0/passage_wallpaper_by_trenchmaker-d4pp3zd.jpg").into(viewHolder.imgThumbnail);
+        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).into(viewHolder.imgThumbnail);
         //Picasso.with(viewHolder.imgThumbnail.getContext()).load(R.drawable.grid_item_mock).into(viewHolder.imgThumbnail);
 
     }
@@ -130,8 +136,11 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
                 {
                     Context mContext = itemView.getContext();
                     Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
+                    PopularMovieGridItem itemToSend = mItems.get(getAdapterPosition());
+                    int i = getAdapterPosition();
+
                     Intent intent = new Intent(mContext, DetailActivity.class)
-                            .putExtra(Intent.EXTRA_TEXT, "Recycler View" + getAdapterPosition());
+                            .putExtra(Intent.EXTRA_TEXT, itemToSend.getmName() + " " + itemToSend.getThumbnail());
                     mContext.startActivity(intent);
                     Toast.makeText(itemView.getContext(),"Recycler View" + getAdapterPosition() + " clicked",Toast.LENGTH_SHORT).show();
                 }

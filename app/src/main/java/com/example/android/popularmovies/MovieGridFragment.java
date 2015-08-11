@@ -1,7 +1,9 @@
 package com.example.android.popularmovies;
 
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -61,6 +63,7 @@ public class MovieGridFragment extends Fragment {
         mRecyclerView.setAdapter(mAdapter);
 
 
+
         return view;
     }
 
@@ -76,14 +79,30 @@ public class MovieGridFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
-            FetchMovieTask movieTask = new FetchMovieTask();
-            movieTask.execute("popularity");
+
+            updateMovieData();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+    private void updateMovieData()
+    {
+        FetchMovieTask movieTask = new FetchMovieTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortorder = prefs.getString(getString(R.string.pref_sort_key),
+                getString(R.string.pref_order_popularity));
+        movieTask.execute(sortorder);
+    }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, String[]> {
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        updateMovieData();
+    }
+
+    public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getName();
         private final String ratingMax = "10.0";
@@ -96,20 +115,22 @@ public class MovieGridFragment extends Fragment {
 
             return Float.toString(userrating) + "/" + ratingMax;
         }
+
         /**
          * Take the String representing the complete movielis in JSON Format and
          * pull out the data we need to construct the Strings needed for the wireframes.
-         *
+         * <p/>
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
          */
-        private String[] getMoviesDataFromJson(String moviesdataJsonStr, int numPages)
+        private PopularMovieGridItem[] getMoviesDataFromJson(String moviesdataJsonStr, int numPages)
                 throws JSONException {
 
             // These are the names of the JSON objects that need to be extracted.
             final String MDB_RESULTS = "results";
             final String MDB_TITLE = "original_title";
             final String MDB_RELEASE_DATE = "release_date";
+            final String MDB_OVERVIEW = "overview";
             final String MDB_POSTER = "poster_path";
             final String MDB_POPULARITY = "popularity";
             final String MDB_VOTE_AVARAGE = "vote_average";
@@ -120,8 +141,10 @@ public class MovieGridFragment extends Fragment {
             JSONArray movieArray = moviesdataJson.getJSONArray(MDB_RESULTS);
 
             String[] resultStrs = new String[movieArray.length()];
+            PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[movieArray.length()];
+
             Log.d(LOG_TAG, Integer.toString(movieArray.length()));
-            for(int i = 0; i < movieArray.length(); i++) {
+            for (int i = 0; i < movieArray.length(); i++) {
                 String name;
                 double rating;
                 String thumbnail;
@@ -133,29 +156,41 @@ public class MovieGridFragment extends Fragment {
 
                 rating = movieObject.getDouble(MDB_VOTE_AVARAGE);
                 thumbnail = movieObject.getString(MDB_POSTER);
+                //Log.d(LOG_TAG, movieObject.getString(MDB_OVERVIEW));
 
 
                 resultStrs[i] = name + " - " + thumbnail + " - " + formatRating((float) rating);
 
+                resultMovies[i] = new PopularMovieGridItem();
+                resultMovies[i].setmName(name);
+                String baseImgURL = "http://image.tmdb.org/t/p/";
+                String sizeImg = "w185//";
+                resultMovies[i].setmThumbnail(baseImgURL + sizeImg + thumbnail);
             }
             for (String s : resultStrs) {
                 Log.v(LOG_TAG, "Movie entry: " + s);
             }
-            return resultStrs;
+
+            return resultMovies;
 
         }
 
         @Override
-        protected void onPostExecute(String[] results) {
-            if(results != null)
-            {
-                for(int i = 0; i < mAdapter.getItemCount(); i++)
-                {
+        protected void onPostExecute(PopularMovieGridItem[] results) {
+            if (results != null) {
+                for (int i = 0; i < mAdapter.getItemCount(); i++) {
                     mAdapter.clearAll();
-                    for (String movieItemStr : results)
+                    /*for (String movieItemStr : results)
                     {
                         PopularMovieGridItem newMovie = new PopularMovieGridItem();
                         newMovie.setmName(movieItemStr);
+                        mAdapter.add(newMovie);
+                    }*/
+                    //Log.d(LOG_TAG, " Results size: " + results.length);
+                    for (int y = 0; y < results.length; y++) {
+                        PopularMovieGridItem newMovie = new PopularMovieGridItem();
+                        newMovie.setmName(results[y].getmName());
+                        newMovie.setmThumbnail(results[y].getThumbnail());
                         mAdapter.add(newMovie);
                     }
                 }
@@ -164,11 +199,10 @@ public class MovieGridFragment extends Fragment {
 
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected PopularMovieGridItem[] doInBackground(String... params) {
 
             // If there is no order, there's nothing to look up. Verify size of params.
-            if( params.length == 0 )
-            {
+            if (params.length == 0) {
                 return null;
             }
 
@@ -206,7 +240,12 @@ public class MovieGridFragment extends Fragment {
                 URL url = new URL(builtUri.toString());
                 //URL url = new URL("http://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key="
                 //        + Constans.MOVIEDB_API_KEY);
+
+                // To check wether the URL gives the expected results,
+                // or to analyze the JSON URL:
+                // http://jsonformatter.curiousconcept.com/
                 Log.v(LOG_TAG, "Built URI " + builtUri.toString());
+
 
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
@@ -254,11 +293,10 @@ public class MovieGridFragment extends Fragment {
                 }
             }
 
-            try{
-                return getMoviesDataFromJson(moviedbJsonStr,numPages);
-            } catch (JSONException e)
-            {
-                Log.e(LOG_TAG, e.getMessage(),e);
+            try {
+                return getMoviesDataFromJson(moviedbJsonStr, numPages);
+            } catch (JSONException e) {
+                Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
             }
 

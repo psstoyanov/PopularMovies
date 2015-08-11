@@ -6,7 +6,7 @@ package com.example.android.popularmovies;
 public class PopularMovieGridItem
 {
     private String mName;
-    private int mThumbnail;
+    private String mThumbnail;
 
     public String getmName()
     {
@@ -18,12 +18,12 @@ public class PopularMovieGridItem
         this.mName = name;
     }
 
-    public int getThumbnail()
+    public String getThumbnail()
     {
         return mThumbnail;
     }
 
-    public void setmThumbnail(int thumbnail)
+    public void setmThumbnail(String thumbnail)
     {
         this.mThumbnail = thumbnail;
     }

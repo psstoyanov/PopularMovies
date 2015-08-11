@@ -27,6 +27,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.popularmovies.MainActivity" />
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="com.example.android.popularmovies.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.popularmovies.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
