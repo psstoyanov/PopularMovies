@@ -59,6 +59,7 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL ," +
+                MoviesEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL ," +
 
                 MoviesEntry.COLUMN_POPULARITY + " INTEGER NOT NULL, " +
                 MoviesEntry.COLUMN_VOTE_AVERAGE + " INTEGER NOT NULL, " +

@@ -143,8 +143,9 @@ public class MovieGridFragment extends Fragment {
             String[] resultStrs = new String[movieArray.length()];
             PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[movieArray.length()];
 
-            Log.d(LOG_TAG, Integer.toString(movieArray.length()));
+            //Log.d(LOG_TAG, Integer.toString(movieArray.length()));
             for (int i = 0; i < movieArray.length(); i++) {
+
                 String name;
                 double rating;
                 String thumbnail;
@@ -205,6 +206,8 @@ public class MovieGridFragment extends Fragment {
             if (params.length == 0) {
                 return null;
             }
+            String sortQuery = params[0];
+
 
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
@@ -232,7 +235,7 @@ public class MovieGridFragment extends Fragment {
 
 
                 Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_PARAM, params[0] + sort_desc)
+                        .appendQueryParameter(SORT_PARAM, sortQuery + sort_desc)
                         .appendQueryParameter(PAGE_PARAM, Integer.toString(numPages))
                         .appendQueryParameter(KEY_PARAM, Constans.MOVIEDB_API_KEY)
                         .build();
@@ -247,7 +250,7 @@ public class MovieGridFragment extends Fragment {
                 Log.v(LOG_TAG, "Built URI " + builtUri.toString());
 
 
-                // Create the request to OpenWeatherMap, and open the connection
+                // Create the request to MovieDB, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -276,7 +279,7 @@ public class MovieGridFragment extends Fragment {
                 moviedbJsonStr = buffer.toString();
                 Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
             } catch (IOException e) {
-                Log.e("DetailFragment", "Error ", e);
+                Log.e(LOG_TAG, "Error ", e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -288,7 +291,7 @@ public class MovieGridFragment extends Fragment {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e("PlaceholderFragment", "Error closing stream", e);
+                        Log.e(LOG_TAG, "Error closing stream", e);
                     }
                 }
             }

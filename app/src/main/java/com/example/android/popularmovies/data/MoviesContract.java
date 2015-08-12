@@ -15,13 +15,34 @@
  */
 package com.example.android.popularmovies.data;
 
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.format.Time;
 
 /**
  * Defines table and column names for the movies database.
  */
-public class MoviesContract {
+public class MoviesContract
+{
+    // The "Content authority" is a name for the entire content provider, similar to the
+    // relationship between a domain name and its website.  A convenient string to use for the
+    // content authority is the package name for the app, which is guaranteed to be unique on the
+    // device.
+    public static final String CONTENT_AUTHORITY = "com.example.android.popularmovies";
+
+    // Use CONTENT_AUTHORITY to create the base of all URI's which apps will use to contact
+    // the content provider.
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+
+    // Possible paths (appended to base content URI for possible URI's)
+    // For instance, content://com.example.android.popularmovies/weather/ is a valid path for
+    // looking at weather data. content://com.example.android.popularmovies/givemeroot/ will fail,
+    // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
+    // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
+    public static final String PATH_MOVIES = "movies";
+    public static final String PATH_SORT_ORDER = "sortorder";
 
     // To make it easy to query for the exact date, we normalize all dates that go into
     // the database to the start of the the Julian day at UTC.
@@ -34,22 +55,46 @@ public class MoviesContract {
     }
 
     /*
-        Inner class that defines the table contents of the location table
+        Inner class that defines the table contents of the sort order table
         Students: This is where you will add the strings.  (Similar to what has been
         done for MovieEntry)
      */
     public static final class SortEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_SORT_ORDER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SORT_ORDER;
+
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_SORT_ORDER;
+
+
         public static final String TABLE_NAME = "sortorder";
 
         // The sort order setting string will be sent to MovieDBApi
         // as a parameter.
         public static final String COLUMN_SORT_SETTING = "sort_setting";
 
+        public static Uri buildLocationUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
     }
 
     // : Change weather table to movies table with the appropriate entries.
     /* Inner class that defines the table contents of the weather table */
     public static final class MoviesEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIES;
+
 
         // The table name.
         public static final String TABLE_NAME = "movies";
@@ -62,6 +107,9 @@ public class MoviesContract {
         // Movies id as returned by API
         public static final String COLUMN_MOVIE_ID = "movies_id";
 
+        // Movies title as returned by API
+        public static final String COLUMN_MOVIE_TITLE = "movies_title";
+
         // Movie overview as provided by API.
         public static final String COLUMN_OVERVIEW = "movie_overview";
 
@@ -71,6 +119,45 @@ public class MoviesContract {
 
         // Movie thumbnail poster url
         public static final String COLUMN_POSTER_PATH = "thumbnail";
+
+        public static Uri buildWeatherUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        /*
+            Student: Fill in this buildWeatherLocation function
+         */
+        public static Uri buildWeatherLocation(String locationSetting) {
+            return null;
+        }
+
+        public static Uri buildWeatherLocationWithStartDate(
+                String locationSetting, long startDate) {
+            long normalizedDate = normalizeDate(startDate);
+            return CONTENT_URI.buildUpon().appendPath(locationSetting)
+                    .appendQueryParameter(COLUMN_RELEASE_DATE, Long.toString(normalizedDate)).build();
+        }
+
+        public static Uri buildWeatherLocationWithDate(String locationSetting, long date) {
+            return CONTENT_URI.buildUpon().appendPath(locationSetting)
+                    .appendPath(Long.toString(normalizeDate(date))).build();
+        }
+
+        public static String getLocationSettingFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static long getDateFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(2));
+        }
+
+        public static long getStartDateFromUri(Uri uri) {
+            String dateString = uri.getQueryParameter(COLUMN_RELEASE_DATE);
+            if (null != dateString && dateString.length() > 0)
+                return Long.parseLong(dateString);
+            else
+                return 0;
+        }
 
     }
 }
