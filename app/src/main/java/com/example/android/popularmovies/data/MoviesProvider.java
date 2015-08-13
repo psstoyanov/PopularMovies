@@ -202,12 +202,30 @@ public class MoviesProvider extends ContentProvider {
             }
             // "weather"
             case MOVIES: {
-                retCursor = null;
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MoviesContract.MoviesEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                //retCursor = null;
                 break;
             }
             // "location"
             case SORT_ORDER: {
-                retCursor = null;
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MoviesContract.SortEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                //retCursor = null;
                 break;
             }
 
