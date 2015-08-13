@@ -88,7 +88,7 @@ public class MovieGridFragment extends Fragment {
     }
     private void updateMovieData()
     {
-        FetchMovieTask movieTask = new FetchMovieTask();
+        FetchMovieTask movieTask = new FetchMovieTask(getActivity(),mAdapter);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         String sortorder = prefs.getString(getString(R.string.pref_sort_key),
                 getString(R.string.pref_order_popularity));
@@ -102,27 +102,27 @@ public class MovieGridFragment extends Fragment {
         updateMovieData();
     }
 
-    public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]> {
+    /*public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]> {
 
         private final String LOG_TAG = FetchMovieTask.class.getName();
         private final String ratingMax = "10.0";
 
-        /**
+        *//**
          * Prepare the movie rating for presentation.
-         */
+         *//*
         private String formatRating(Float userrating) {
 
 
             return Float.toString(userrating) + "/" + ratingMax;
         }
 
-        /**
+        *//**
          * Take the String representing the complete movielis in JSON Format and
          * pull out the data we need to construct the Strings needed for the wireframes.
          * <p/>
          * Fortunately parsing is easy:  constructor takes the JSON string and converts it
          * into an Object hierarchy for us.
-         */
+         *//*
         private PopularMovieGridItem[] getMoviesDataFromJson(String moviesdataJsonStr, int numPages)
                 throws JSONException {
 
@@ -182,12 +182,12 @@ public class MovieGridFragment extends Fragment {
             if (results != null) {
                 for (int i = 0; i < mAdapter.getItemCount(); i++) {
                     mAdapter.clearAll();
-                    /*for (String movieItemStr : results)
+                    *//*for (String movieItemStr : results)
                     {
                         PopularMovieGridItem newMovie = new PopularMovieGridItem();
                         newMovie.setmName(movieItemStr);
                         mAdapter.add(newMovie);
-                    }*/
+                    }*//*
                     //Log.d(LOG_TAG, " Results size: " + results.length);
                     for (int y = 0; y < results.length; y++) {
                         PopularMovieGridItem newMovie = new PopularMovieGridItem();
@@ -218,9 +218,9 @@ public class MovieGridFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String moviedbJsonStr = null;
             String sort_desc = ".desc";
-            /* By default, the first page of results will be shown.
+            *//* By default, the first page of results will be shown.
             *  TheMovieDB API displays 20 results per page.
-            *  */
+            *  *//*
             int numPages = 1;
 
 
@@ -306,5 +306,5 @@ public class MovieGridFragment extends Fragment {
 
             return null;
         }
-    }
+    }*/
 }

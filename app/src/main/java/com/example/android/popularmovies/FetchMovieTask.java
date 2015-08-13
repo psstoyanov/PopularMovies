@@ -15,13 +15,17 @@
  */
 package com.example.android.popularmovies;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.popularmovies.data.MoviesContract;
 import com.example.android.popularmovies.data.MoviesContract.MoviesEntry;
 
 import org.json.JSONArray;
@@ -34,10 +38,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Vector;
 
-public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]>
-{
+public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     private final String ratingMax = "10.0";
@@ -55,28 +60,73 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
     private boolean DEBUG = true;
 
 
-
     /**
      * Prepare the movie rating for presentation.
+     * @param userrating
      */
-    private String formatRating(Float userrating) {
+    private String formatRating(Double userrating) {
 
 
-        return Float.toString(userrating) + "/" + ratingMax;
+        return Double.toString(userrating) + "/" + ratingMax;
+    }
+    private String getReadableDateString(long time){
+        // Because the API returns a unix timestamp (measured in seconds),
+        // it must be converted to milliseconds in order to be converted to valid date.
+        Date date = new Date(time);
+        SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
+        return format.format(date).toString();
     }
 
 
     /**
      * Helper method to handle insertion of a new location in the weather database.
      *
-     * @param locationSetting The location string used to request updates from the server.
+     * @param sortSetting The location string used to request updates from the server.
      * @return the row ID of the added location.
      */
-    long addsortOrder(String locationSetting) {
+    long addsortOrder(String sortSetting) {
+
+        long sortRowId;
         // Students: First, check if the location with this city name exists in the db
+        Cursor sortCursor = mContext.getContentResolver().query(
+                MoviesContract.SortEntry.CONTENT_URI,
+                new String[]{MoviesContract.SortEntry._ID},
+                MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ?",
+                new String[]{sortSetting},
+                null);
+        if (sortCursor.moveToFirst()) {
+            int locationIdIndex = sortCursor.getColumnIndex(MoviesContract.SortEntry._ID);
+            sortRowId = sortCursor.getLong(locationIdIndex);
+        } else {
+            // Now that the content provider is set up, inserting rows of data is pretty simple.
+            // First create a ContentValues object to hold the data you want to insert.
+            ContentValues sortValues = new ContentValues();
+
+            // Then add the data, along with the corresponding name of the data type,
+            // so the content provider knows what kind of value is being inserted.
+            //sortValues.put(MoviesContract.SortEntry.COLUMN_CITY_NAME, cityName);
+            sortValues.put(MoviesContract.SortEntry.COLUMN_SORT_SETTING, sortSetting);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
+
+            // Finally, insert location data into the database.
+            Uri insertedUri = mContext.getContentResolver().insert(
+                    MoviesContract.SortEntry.CONTENT_URI,
+                    sortValues
+            );
+
+            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+            sortRowId = ContentUris.parseId(insertedUri);
+        }
+
+        sortCursor.close();
+        // Wait, that worked?  Yes!
+        return sortRowId;
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
-        return -1;
+
     }
 
     /*
@@ -84,31 +134,29 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
         the UX expects so that we can continue to test the application even once we begin using
         the database.
      */
-    /*String[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
+    String[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
         // return strings to keep UI functional for now
         String[] resultStrs = new String[cvv.size()];
         for ( int i = 0; i < cvv.size(); i++ ) {
             ContentValues moviesValues = cvv.elementAt(i);
-            String highAndLow = formatHighLows(
-                    moviesValues.getAsDouble(MoviesEntry.COLUMN_MAX_TEMP),
-                    moviesValues.getAsDouble(MoviesEntry.COLUMN_MIN_TEMP));
-            resultStrs[i] = getReadableDateString(
-                    moviesValues.getAsLong(MoviesEntry.COLUMN_DATE)) +
-                    " - " + moviesValues.getAsString(MoviesEntry.COLUMN_SHORT_DESC) +
+            String highAndLow = formatRating(
+                    moviesValues.getAsDouble(MoviesEntry.COLUMN_POPULARITY));
+            resultStrs[i] =
+                    moviesValues.getAsString(MoviesEntry.COLUMN_RELEASE_DATE) +
+                    " - " + moviesValues.getAsString(MoviesEntry.COLUMN_OVERVIEW) +
                     " - " + highAndLow;
         }
         return resultStrs;
-    }*/
+    }
 
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
-     *
+     * <p/>
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private PopularMovieGridItem[] getMoviesDataFromJson(String moviesdataJsonStr,
-                                            String sortSetting)
+    private PopularMovieGridItem[] getMoviesDataFromJson(String moviesdataJsonStr, String sortSetting)
             throws JSONException {
 
         // Now we have a String representing the complete forecast in JSON Format.
@@ -147,7 +195,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
             // Insert the new weather information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
 
-            String[] resultStrs = new String[movieArray.length()];
+            //String[] resultStrs = new String[movieArray.length()];
             PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[movieArray.length()];
             // we start at the day returned by local time. Otherwise this is a mess.
             //int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
@@ -155,7 +203,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
             // now we work exclusively in UTC
             //dayTime = new Time();
 
-            for(int i = 0; i < movieArray.length(); i++) {
+            for (int i = 0; i < movieArray.length(); i++)
+            {
                 // These are the values that will be collected.
                 String movie_title;
                 String movie_release_date;
@@ -212,48 +261,63 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 movie_thumbnail_base = movieObject.getString(MDB_POSTER);
                 movie_thumbnail = baseImgURL + sizeImg + movie_thumbnail_base;
 
+                resultMovies[i] = new PopularMovieGridItem();
+                resultMovies[i].setmName(movie_title);
+                resultMovies[i].setmThumbnail(movie_thumbnail);
 
 
                 ContentValues moviesValues = new ContentValues();
 
                 moviesValues.put(MoviesEntry.COLUMN_SORT_KEY, sortorderID);
-                moviesValues.put(MoviesEntry.COLUMN_MOVIE_TITLE,movie_title);
+                moviesValues.put(MoviesEntry.COLUMN_MOVIE_TITLE, movie_title);
                 moviesValues.put(MoviesEntry.COLUMN_MOVIE_ID, movie_id);
                 moviesValues.put(MoviesEntry.COLUMN_OVERVIEW, movie_overview);
                 moviesValues.put(MoviesEntry.COLUMN_POSTER_PATH, movie_thumbnail);
                 moviesValues.put(MoviesEntry.COLUMN_POPULARITY, movie_popularity);
-                moviesValues.put(MoviesEntry.COLUMN_VOTE_AVERAGE, formatRating((float) movie_rating));
+                moviesValues.put(MoviesEntry.COLUMN_VOTE_AVERAGE, formatRating((double) movie_rating));
                 moviesValues.put(MoviesEntry.COLUMN_RELEASE_DATE, movie_release_date);
                 cVVector.add(moviesValues);
             }
 
             // add to database
-            if ( cVVector.size() > 0 ) {
+            if (cVVector.size() > 0) {
                 // Student: call bulkInsert to add the weatherEntries to the database here
+                ContentValues[] cvArray = new ContentValues[cVVector.size()];
+
+                cVVector.toArray(cvArray);
+                mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI,cvArray);
             }
 
             // Sort order:  Ascending, by date.
-           // String sortOrder = MoviesEntry.COLUMN_DATE + " ASC";
-           // Uri weatherForLocationUri = MoviesEntry.buildWeatherLocationWithStartDate(
-           // locationSetting, System.currentTimeMillis());
+             String sortOrder = MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC";
+             //Uri weatherForLocationUri = MoviesEntry.buildWeatherLocationWithStartDate(
+             Uri weatherForLocationUri = MoviesEntry.buildMoviesSortorder(
+             sortSetting);
 
             // Students: Uncomment the next lines to display what what you stored in the bulkInsert
 
-//            Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
-//                    null, null, null, sortOrder);
-//
-//            cVVector = new Vector<ContentValues>(cur.getCount());
-//            if ( cur.moveToFirst() ) {
-//                do {
-//                    ContentValues cv = new ContentValues();
-//                    DatabaseUtils.cursorRowToContentValues(cur, cv);
-//                    cVVector.add(cv);
-//                } while (cur.moveToNext());
-//            }
+            //Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
+            //        null, null, null, sortOrder);
+            Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
+                    null, null, null, sortOrder);
+
+            cVVector = new Vector<ContentValues>(cur.getCount());
+            if ( cur.moveToFirst() ) {
+                do {
+                    ContentValues cv = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(cur, cv);
+                    cVVector.add(cv);
+                } while (cur.moveToNext());
+            }
 
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
 
-            //String[] resultStrs = convertContentValuesToUXFormat(cVVector);
+            String[] resultStrs = convertContentValuesToUXFormat(cVVector);
+            /*for (PopularMovieGridItem movieItemStr : resultMovies)
+            {
+                Log.d(LOG_TAG, movieItemStr.getmName());
+            }*/
+
             return resultMovies;
 
         } catch (JSONException e) {
@@ -377,24 +441,30 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
         }
     }*/
     @Override
-    protected void onPostExecute(PopularMovieGridItem[] results) {
-        if (results != null) {
-            for (int i = 0; i < mAdapter.getItemCount(); i++) {
+    protected void onPostExecute(PopularMovieGridItem[] results)
+    {
+        if (results != null && mAdapter != null)
+        {
+            //for (int i = 0; i < mAdapter.getItemCount(); i++)
+            //{
                 mAdapter.clearAll();
-                    /*for (String movieItemStr : results)
+                    for (PopularMovieGridItem movieItemObj : results)
                     {
                         PopularMovieGridItem newMovie = new PopularMovieGridItem();
-                        newMovie.setmName(movieItemStr);
+                        newMovie.setmName(movieItemObj.getmName());
+                        newMovie.setmThumbnail(movieItemObj.getThumbnail());
                         mAdapter.add(newMovie);
-                    }*/
+                    }
                 //Log.d(LOG_TAG, " Results size: " + results.length);
-                for (int y = 0; y < results.length; y++) {
+                //Log.d(LOG_TAG, results.toString());
+                /*for (int y = 0; y < results.length; y++)
+                {
                     PopularMovieGridItem newMovie = new PopularMovieGridItem();
                     newMovie.setmName(results[y].getmName());
                     newMovie.setmThumbnail(results[y].getThumbnail());
                     mAdapter.add(newMovie);
-                }
-            }
+                }*/
+            //}
         }
     }
 }
