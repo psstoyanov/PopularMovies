@@ -22,7 +22,7 @@ import java.util.Set;
  */
 public class TestUtilities extends AndroidTestCase {
     static final String TEST_SORT_ORDER = "popularity";
-    static final String TEST_ORDER = "popularity";  // By popularity.
+    static final String TEST_DATE = "2015";  // By popularity.
 
     static void validateCursor(String error, Cursor valueCursor, ContentValues expectedValues) {
         assertTrue("Empty cursor returned. " + error, valueCursor.moveToFirst());
@@ -48,8 +48,8 @@ public class TestUtilities extends AndroidTestCase {
      */
     static ContentValues createMoviesValues(long sortRowId) {
         ContentValues moviesValues = new ContentValues();
-        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, TEST_ORDER);
-        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, "2015");
+        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortRowId);
+        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, TEST_DATE);
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, 1.1);
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, "Despicable me");
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, "Asteroids");

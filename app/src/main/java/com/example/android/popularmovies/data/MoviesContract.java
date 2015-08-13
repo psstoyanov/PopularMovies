@@ -79,7 +79,7 @@ public class MoviesContract
         // as a parameter.
         public static final String COLUMN_SORT_SETTING = "sort_setting";
 
-        public static Uri buildLocationUri(long id) {
+        public static Uri buildSortUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
@@ -138,31 +138,31 @@ public class MoviesContract
         }
 
         public static Uri buildMoviesSortordernWithStartDate(
-                String sortSetting, long startDate) {
+                String sortSetting, String startDate) {
             //long normalizedDate = normalizeDate(startDate);
             return CONTENT_URI.buildUpon().appendPath(sortSetting)
-                    .appendQueryParameter(COLUMN_RELEASE_DATE, Long.toString(startDate)).build();
+                    .appendQueryParameter(COLUMN_RELEASE_DATE, startDate).build();
         }
 
-        public static Uri buildWeatherLocationWithDate(String locationSetting, long date) {
+        public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendPath(Long.toString(date)).build();
+                    .appendPath(date).build();
         }
 
         public static String getSortSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
 
-        public static long getDateFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(2));
+        public static String getDateFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
         }
 
-        public static long getStartDateFromUri(Uri uri) {
+        public static String getStartDateFromUri(Uri uri) {
             String dateString = uri.getQueryParameter(COLUMN_RELEASE_DATE);
             if (null != dateString && dateString.length() > 0)
-                return Long.parseLong(dateString);
+                return dateString;
             else
-                return 0;
+                return "0";
         }
 
     }

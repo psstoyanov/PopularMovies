@@ -16,11 +16,13 @@
 package com.example.android.popularmovies.data;
 
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -159,7 +161,7 @@ public class TestProvider extends AndroidTestCase {
         assertEquals("Error: the MoviesEntry CONTENT_URI with sort order should return MoviesEntry.CONTENT_TYPE",
                 MoviesEntry.CONTENT_TYPE, type);
 
-        long testDate = 1419120000L; // December 21st, 2014
+        String testDate = "2015"; // December 21st, 2014
         // content://com.example.android.popularmovies/movies/94074/20140612
         type = mContext.getContentResolver().getType(
                 MoviesEntry.buildWeatherLocationWithDate(testLocation, testDate));
@@ -310,106 +312,108 @@ public class TestProvider extends AndroidTestCase {
     // Student: Uncomment this test after you have completed writing the insert functionality
     // in your provider.  It relies on insertions with testInsertReadProvider, so insert and
     // query functionality must also be complete before this test can be used.
-//    public void testInsertReadProvider() {
-//        ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
-//
-//        // Register a content observer for our insert.  This time, directly with the content resolver
-//        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-//        mContext.getContentResolver().registerContentObserver(SortEntry.CONTENT_URI, true, tco);
-//        Uri locationUri = mContext.getContentResolver().insert(SortEntry.CONTENT_URI, testValues);
-//
-//        // Did our content observer get called?  Students:  If this fails, your insert location
-//        // isn't calling getContext().getContentResolver().notifyChange(uri, null);
-//        tco.waitForNotificationOrFail();
-//        mContext.getContentResolver().unregisterContentObserver(tco);
-//
-//        long locationRowId = ContentUris.parseId(locationUri);
-//
-//        // Verify we got a row back.
-//        assertTrue(locationRowId != -1);
-//
-//        // Data's inserted.  IN THEORY.  Now pull some out to stare at it and verify it made
-//        // the round trip.
-//
-//        // A cursor is your primary interface to the query results.
-//        Cursor cursor = mContext.getContentResolver().query(
-//                SortEntry.CONTENT_URI,
-//                null, // leaving "columns" null just returns all the columns.
-//                null, // cols for "where" clause
-//                null, // values for "where" clause
-//                null  // sort order
-//        );
-//
-//        TestUtilities.validateCursor("testInsertReadProvider. Error validating SortEntry.",
-//                cursor, testValues);
-//
-//        // Fantastic.  Now that we have a location, add some weather!
-//        ContentValues moviesValues = TestUtilities.createmoviesValues(locationRowId);
-//        // The TestContentObserver is a one-shot class
-//        tco = TestUtilities.getTestContentObserver();
-//
-//        mContext.getContentResolver().registerContentObserver(MoviesEntry.CONTENT_URI, true, tco);
-//
-//        Uri weatherInsertUri = mContext.getContentResolver()
-//                .insert(MoviesEntry.CONTENT_URI, moviesValues);
-//        assertTrue(weatherInsertUri != null);
-//
-//        // Did our content observer get called?  Students:  If this fails, your insert weather
-//        // in your ContentProvider isn't calling
-//        // getContext().getContentResolver().notifyChange(uri, null);
-//        tco.waitForNotificationOrFail();
-//        mContext.getContentResolver().unregisterContentObserver(tco);
-//
-//        // A cursor is your primary interface to the query results.
-//        Cursor weatherCursor = mContext.getContentResolver().query(
-//                MoviesEntry.CONTENT_URI,  // Table to Query
-//                null, // leaving "columns" null just returns all the columns.
-//                null, // cols for "where" clause
-//                null, // values for "where" clause
-//                null // columns to group by
-//        );
-//
-//        TestUtilities.validateCursor("testInsertReadProvider. Error validating MoviesEntry insert.",
-//                weatherCursor, moviesValues);
-//
-//        // Add the location values in with the weather data so that we can make
-//        // sure that the join worked and we actually get all the values back
-//        moviesValues.putAll(testValues);
-//
-//        // Get the joined Weather and Location data
-//        weatherCursor = mContext.getContentResolver().query(
-//                MoviesEntry.buildMoviesSortorder(TestUtilities.TEST_LOCATION),
-//                null, // leaving "columns" null just returns all the columns.
-//                null, // cols for "where" clause
-//                null, // values for "where" clause
-//                null  // sort order
-//        );
-//        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data.",
-//                weatherCursor, moviesValues);
-//
-//        // Get the joined Weather and Location data with a start date
-//        weatherCursor = mContext.getContentResolver().query(
-//                MoviesEntry.buildWeatherLocationWithStartDate(
-//                        TestUtilities.TEST_LOCATION, TestUtilities.TEST_DATE),
-//                null, // leaving "columns" null just returns all the columns.
-//                null, // cols for "where" clause
-//                null, // values for "where" clause
-//                null  // sort order
-//        );
-//        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data with start date.",
-//                weatherCursor, moviesValues);
-//
-//        // Get the joined Weather data for a specific date
-//        weatherCursor = mContext.getContentResolver().query(
-//                MoviesEntry.buildWeatherLocationWithDate(TestUtilities.TEST_LOCATION, TestUtilities.TEST_DATE),
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location data for a specific date.",
-//                weatherCursor, moviesValues);
-//    }
+    public void testInsertReadProvider() {
+        //ContentValues testValues = TestUtilities.createNorthPoleLocationValues();
+        ContentValues testValues = TestUtilities.createTestSortOrderValues();
+
+        // Register a content observer for our insert.  This time, directly with the content resolver
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(SortEntry.CONTENT_URI, true, tco);
+        Uri locationUri = mContext.getContentResolver().insert(SortEntry.CONTENT_URI, testValues);
+
+        // Did our content observer get called?  Students:  If this fails, your insert location
+        // isn't calling getContext().getContentResolver().notifyChange(uri, null);
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        long locationRowId = ContentUris.parseId(locationUri);
+
+        // Verify we got a row back.
+        assertTrue(locationRowId != -1);
+
+        // Data's inserted.  IN THEORY.  Now pull some out to stare at it and verify it made
+        // the round trip.
+
+        // A cursor is your primary interface to the query results.
+        Cursor cursor = mContext.getContentResolver().query(
+                SortEntry.CONTENT_URI,
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
+
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating SortEntry.",
+                cursor, testValues);
+
+        // Fantastic.  Now that we have a location, add some weather!
+        ContentValues moviesValues = TestUtilities.createMoviesValues(locationRowId);
+        // The TestContentObserver is a one-shot class
+        tco = TestUtilities.getTestContentObserver();
+
+        mContext.getContentResolver().registerContentObserver(MoviesEntry.CONTENT_URI, true, tco);
+
+        Uri weatherInsertUri = mContext.getContentResolver()
+                .insert(MoviesEntry.CONTENT_URI, moviesValues);
+        assertTrue(weatherInsertUri != null);
+
+        // Did our content observer get called?  Students:  If this fails, your insert weather
+        // in your ContentProvider isn't calling
+        // getContext().getContentResolver().notifyChange(uri, null);
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        // A cursor is your primary interface to the query results.
+        Cursor weatherCursor = mContext.getContentResolver().query(
+                MoviesEntry.CONTENT_URI,  // Table to Query
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null // columns to group by
+        );
+
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating MoviesEntry insert.",
+                weatherCursor, moviesValues);
+
+        // Add the location values in with the weather data so that we can make
+        // sure that the join worked and we actually get all the values back
+        moviesValues.putAll(testValues);
+
+        // Get the joined Weather and Location data
+        weatherCursor = mContext.getContentResolver().query(
+                MoviesEntry.buildMoviesSortorder(TestUtilities.TEST_SORT_ORDER),
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data.",
+                weatherCursor, moviesValues);
+
+        // Get the joined Weather and Location data with a start date
+        weatherCursor = mContext.getContentResolver().query(
+                //MoviesEntry.buildWeatherLocationWithStartDate(
+                MoviesEntry.buildMoviesSortordernWithStartDate(
+                        TestUtilities.TEST_SORT_ORDER, TestUtilities.TEST_DATE),
+                null, // leaving "columns" null just returns all the columns.
+                null, // cols for "where" clause
+                null, // values for "where" clause
+                null  // sort order
+        );
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location Data with start date.",
+                weatherCursor, moviesValues);
+
+        // Get the joined Weather data for a specific date
+        weatherCursor = mContext.getContentResolver().query(
+                MoviesEntry.buildWeatherLocationWithDate(TestUtilities.TEST_SORT_ORDER, TestUtilities.TEST_DATE),
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider.  Error validating joined Weather and Location data for a specific date.",
+                weatherCursor, moviesValues);
+    }
 
     // Make sure we can still delete after adding/updating stuff
     //

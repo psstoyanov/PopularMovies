@@ -35,13 +35,23 @@ public class MoviesProvider extends ContentProvider {
     static final int MOVIES_WITH_SORT_ORDER_AND_DATE = 102;
     static final int SORT_ORDER = 300;
 
+    // This class helps construct queries and is used as the basis
+    // the query function that is already used in the
+    // SQLite database class.
     private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
 
-    static{
+    static {
+        // Initialize the SQLiteQueryBuilder in the static constructor
+        // of the class, describing the join between both tables.
         sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
-        
+
         //This is an inner join which looks like
-        //weather INNER JOIN location ON weather.location_id = location._id
+        //movies INNER JOIN sortorder ON movies.sortorder_id = sortorder._id
+
+        // SetTables fills out the content in the form part of the SQL query.
+        // Note, since both tables have a field with an _ID,
+        // we must explicitly use the table name in order to disambiguate
+        // which _ID we are talking about.
         sWeatherByLocationSettingQueryBuilder.setTables(
                 MoviesContract.MoviesEntry.TABLE_NAME + " INNER JOIN " +
                         MoviesContract.SortEntry.TABLE_NAME +
@@ -51,14 +61,16 @@ public class MoviesProvider extends ContentProvider {
                         "." + MoviesContract.SortEntry._ID);
     }
 
+    // Then we define the selection.
+    // The selection is defined using the question mark replacement syntax.
     //location.location_setting = ?
     private static final String sLocationSettingSelection =
-            MoviesContract.SortEntry.TABLE_NAME+
+            MoviesContract.SortEntry.TABLE_NAME +
                     "." + MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ? ";
 
     //location.location_setting = ? AND date >= ?
     private static final String sLocationSettingWithStartDateSelection =
-            MoviesContract.SortEntry.TABLE_NAME+
+            MoviesContract.SortEntry.TABLE_NAME +
                     "." + MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ? AND " +
                     MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE + " >= ? ";
 
@@ -68,18 +80,19 @@ public class MoviesProvider extends ContentProvider {
                     "." + MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ? AND " +
                     MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE + " = ? ";
 
+    // A function to get the movies by sort setting using the same query builder.
     private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
         String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
-        long startDate = MoviesContract.MoviesEntry.getStartDateFromUri(uri);
+        String startDate = MoviesContract.MoviesEntry.getStartDateFromUri(uri);
 
         String[] selectionArgs;
         String selection;
 
-        if (startDate == 0) {
+        if (Integer.parseInt(startDate) == 0) {
             selection = sLocationSettingSelection;
             selectionArgs = new String[]{locationSetting};
         } else {
-            selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
+            selectionArgs = new String[]{locationSetting, startDate};
             selection = sLocationSettingWithStartDateSelection;
         }
 
@@ -93,15 +106,17 @@ public class MoviesProvider extends ContentProvider {
         );
     }
 
+    // A function to get the movies by sort setting using the same query builder.
+    // We do that for both the queries we're creating this way.
     private Cursor getWeatherByLocationSettingAndDate(
             Uri uri, String[] projection, String sortOrder) {
         String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
-        long date = MoviesContract.MoviesEntry.getDateFromUri(uri);
+        String date = MoviesContract.MoviesEntry.getDateFromUri(uri);
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sLocationSettingAndDaySelection,
-                new String[]{locationSetting, Long.toString(date)},
+                new String[]{locationSetting, date},
                 null,
                 null,
                 sortOrder
@@ -114,6 +129,7 @@ public class MoviesProvider extends ContentProvider {
         and SORT_ORDER integer constants defined above.  You can test this by uncommenting the
         testUriMatcher test within TestUriMatcher.
      */
+
     static UriMatcher buildUriMatcher() {
         // 1) The code passed into the constructor represents the code to return for the root
         // URI.  It's common to use NO_MATCH as the code for this case. Add the constructor below.
@@ -138,7 +154,7 @@ public class MoviesProvider extends ContentProvider {
         // For each type of URI we want to add, create a corresponding code.
         matcher.addURI(authority, MoviesContract.PATH_MOVIES, MOVIES);
         matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*", MOVIES_WITH_SORT_ORDER);
-        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*/#", MOVIES_WITH_SORT_ORDER_AND_DATE);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*/*", MOVIES_WITH_SORT_ORDER_AND_DATE);
 
 
         // 3) Return the new matcher!
@@ -189,9 +205,11 @@ public class MoviesProvider extends ContentProvider {
         // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
+
+            // Finaly, added the functions into the query routine of the content provider,
+            // for both MOVIES_WITH_SORT_ORDER_AND_DATE  and MOVIES_WITH_SORT_ORDER.
             // "weather/*/*"
-            case MOVIES_WITH_SORT_ORDER_AND_DATE:
-            {
+            case MOVIES_WITH_SORT_ORDER_AND_DATE: {
                 retCursor = getWeatherByLocationSettingAndDate(uri, projection, sortOrder);
                 break;
             }
@@ -246,12 +264,23 @@ public class MoviesProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
+            // For movies, we just passed the parameters that came into the
+            // content provider into the data base insert call.
             case MOVIES: {
-               // normalizeDate(values);
+                // normalizeDate(values);
                 long _id = db.insert(MoviesContract.MoviesEntry.TABLE_NAME, null, values);
-                if ( _id > 0 )
+                if (_id > 0)
                     returnUri = MoviesContract.MoviesEntry.buildMoviesUri(_id);
                 else
+                    // Throw an exception if the insert fails.
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case SORT_ORDER: {
+                long _id = db.insert(MoviesContract.SortEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MoviesContract.SortEntry.buildSortUri(_id);
+                else //Throw an exception if the insert fails.
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
