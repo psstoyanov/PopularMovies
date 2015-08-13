@@ -138,9 +138,9 @@ public class MoviesContract
         }
 
         public static Uri buildMoviesSortordernWithStartDate(
-                String locationSetting, long startDate) {
+                String sortSetting, long startDate) {
             //long normalizedDate = normalizeDate(startDate);
-            return CONTENT_URI.buildUpon().appendPath(locationSetting)
+            return CONTENT_URI.buildUpon().appendPath(sortSetting)
                     .appendQueryParameter(COLUMN_RELEASE_DATE, Long.toString(startDate)).build();
         }
 

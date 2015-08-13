@@ -144,26 +144,26 @@ public class TestProvider extends AndroidTestCase {
             functioning correctly.
          */
     public void testGetType() {
-        // content://com.example.android.sunshine.app/weather/
+        // content://com.example.android.popularmovies/movies/
         String type = mContext.getContentResolver().getType(MoviesEntry.CONTENT_URI);
-        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        // vnd.android.cursor.dir/com.example.android.popularmovies/movies
         assertEquals("Error: the MoviesEntry CONTENT_URI should return MoviesEntry.CONTENT_TYPE",
                 MoviesEntry.CONTENT_TYPE, type);
 
         String testLocation = "94074";
-        // content://com.example.android.sunshine.app/weather/94074
+        // content://com.example.android.popularmovies/movies/94074
         type = mContext.getContentResolver().getType(
                 MoviesEntry.buildMoviesSortorder(testLocation));
-        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
-        assertEquals("Error: the MoviesEntry CONTENT_URI with location should return MoviesEntry.CONTENT_TYPE",
+        // vnd.android.cursor.dir/com.example.android.popularmovies/movies
+        assertEquals("Error: the MoviesEntry CONTENT_URI with sort order should return MoviesEntry.CONTENT_TYPE",
                 MoviesEntry.CONTENT_TYPE, type);
 
         long testDate = 1419120000L; // December 21st, 2014
-        // content://com.example.android.sunshine.app/weather/94074/20140612
+        // content://com.example.android.popularmovies/movies/94074/20140612
         type = mContext.getContentResolver().getType(
                 MoviesEntry.buildWeatherLocationWithDate(testLocation, testDate));
-        // vnd.android.cursor.item/com.example.android.sunshine.app/weather/1419120000
-        assertEquals("Error: the MoviesEntry CONTENT_URI with location and date should return MoviesEntry.CONTENT_ITEM_TYPE",
+        // vnd.android.cursor.item/com.example.android.popularmovies/movies/1419120000
+        assertEquals("Error: the MoviesEntry CONTENT_URI with sort order and date should return MoviesEntry.CONTENT_ITEM_TYPE",
                 MoviesEntry.CONTENT_ITEM_TYPE, type);
 
         // content://com.example.android.sunshine.app/location/
