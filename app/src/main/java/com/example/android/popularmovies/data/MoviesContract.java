@@ -42,7 +42,7 @@ public class MoviesContract
     // as the ContentProvider hasn't been given any information on what to do with "givemeroot".
     // At least, let's hope not.  Don't be that dev, reader.  Don't be that dev.
     public static final String PATH_MOVIES = "movies";
-    public static final String PATH_SORT_ORDER = "sortorder";
+    public static final String PATH_SORT_ORDER = "sort_order";
 
     // To make it easy to query for the exact date, we normalize all dates that go into
     // the database to the start of the the Julian day at UTC.
@@ -61,6 +61,8 @@ public class MoviesContract
      */
     public static final class SortEntry implements BaseColumns {
 
+        // Content URI representing the base location
+        // for the table.
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_SORT_ORDER).build();
 
@@ -87,6 +89,8 @@ public class MoviesContract
     /* Inner class that defines the table contents of the weather table */
     public static final class MoviesEntry implements BaseColumns {
 
+        // Content URI representing the base location
+        // for the table.
         public static final Uri CONTENT_URI =
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIES).build();
 
@@ -120,30 +124,32 @@ public class MoviesContract
         // Movie thumbnail poster url
         public static final String COLUMN_POSTER_PATH = "thumbnail";
 
-        public static Uri buildWeatherUri(long id) {
+        public static Uri buildMoviesUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
         /*
-            Student: Fill in this buildWeatherLocation function
+            Student: Fill in this buildMoviesSortorder function
          */
-        public static Uri buildWeatherLocation(String locationSetting) {
-            return null;
+        public static Uri buildMoviesSortorder(String sortSetting)
+        {
+            // Append path segment for the sort order to the movie URI
+            return CONTENT_URI.buildUpon().appendPath(sortSetting).build();
         }
 
-        public static Uri buildWeatherLocationWithStartDate(
+        public static Uri buildMoviesSortordernWithStartDate(
                 String locationSetting, long startDate) {
-            long normalizedDate = normalizeDate(startDate);
+            //long normalizedDate = normalizeDate(startDate);
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendQueryParameter(COLUMN_RELEASE_DATE, Long.toString(normalizedDate)).build();
+                    .appendQueryParameter(COLUMN_RELEASE_DATE, Long.toString(startDate)).build();
         }
 
         public static Uri buildWeatherLocationWithDate(String locationSetting, long date) {
             return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendPath(Long.toString(normalizeDate(date))).build();
+                    .appendPath(Long.toString(date)).build();
         }
 
-        public static String getLocationSettingFromUri(Uri uri) {
+        public static String getSortSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
 

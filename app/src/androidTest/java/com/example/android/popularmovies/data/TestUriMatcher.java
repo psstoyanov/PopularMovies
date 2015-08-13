@@ -31,7 +31,7 @@ public class TestUriMatcher extends AndroidTestCase {
 
    /* // content://com.example.android.sunshine.app/weather"
     private static final Uri TEST_WEATHER_DIR = WeatherContract.WeatherEntry.CONTENT_URI;
-    private static final Uri TEST_WEATHER_WITH_LOCATION_DIR = WeatherContract.WeatherEntry.buildWeatherLocation(LOCATION_QUERY);
+    private static final Uri TEST_WEATHER_WITH_LOCATION_DIR = WeatherContract.WeatherEntry.buildMoviesSortorder(LOCATION_QUERY);
     private static final Uri TEST_WEATHER_WITH_LOCATION_AND_DATE_DIR = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(LOCATION_QUERY, TEST_DATE);
     // content://com.example.android.sunshine.app/location"
     private static final Uri TEST_LOCATION_DIR = WeatherContract.LocationEntry.CONTENT_URI;
@@ -42,15 +42,15 @@ public class TestUriMatcher extends AndroidTestCase {
         ready to test your UriMatcher.
      */
 //    public void testUriMatcher() {
-//        UriMatcher testMatcher = WeatherProvider.buildUriMatcher();
+//        UriMatcher testMatcher = MoviesProvider.buildUriMatcher();
 //
-//        assertEquals("Error: The WEATHER URI was matched incorrectly.",
-//                testMatcher.match(TEST_WEATHER_DIR), WeatherProvider.WEATHER);
-//        assertEquals("Error: The WEATHER WITH LOCATION URI was matched incorrectly.",
-//                testMatcher.match(TEST_WEATHER_WITH_LOCATION_DIR), WeatherProvider.WEATHER_WITH_LOCATION);
-//        assertEquals("Error: The WEATHER WITH LOCATION AND DATE URI was matched incorrectly.",
-//                testMatcher.match(TEST_WEATHER_WITH_LOCATION_AND_DATE_DIR), WeatherProvider.WEATHER_WITH_LOCATION_AND_DATE);
-//        assertEquals("Error: The LOCATION URI was matched incorrectly.",
-//                testMatcher.match(TEST_LOCATION_DIR), WeatherProvider.LOCATION);
+//        assertEquals("Error: The MOVIES URI was matched incorrectly.",
+//                testMatcher.match(TEST_WEATHER_DIR), MoviesProvider.MOVIES);
+//        assertEquals("Error: The MOVIES WITH SORT_ORDER URI was matched incorrectly.",
+//                testMatcher.match(TEST_WEATHER_WITH_LOCATION_DIR), MoviesProvider.MOVIES_WITH_SORT_ORDER);
+//        assertEquals("Error: The MOVIES WITH SORT_ORDER AND DATE URI was matched incorrectly.",
+//                testMatcher.match(TEST_WEATHER_WITH_LOCATION_AND_DATE_DIR), MoviesProvider.MOVIES_WITH_SORT_ORDER_AND_DATE);
+//        assertEquals("Error: The SORT_ORDER URI was matched incorrectly.",
+//                testMatcher.match(TEST_LOCATION_DIR), MoviesProvider.SORT_ORDER);
 //    }
 }

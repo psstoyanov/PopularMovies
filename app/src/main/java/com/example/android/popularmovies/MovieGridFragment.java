@@ -167,6 +167,7 @@ public class MovieGridFragment extends Fragment {
                 String baseImgURL = "http://image.tmdb.org/t/p/";
                 String sizeImg = "w185//";
                 resultMovies[i].setmThumbnail(baseImgURL + sizeImg + thumbnail);
+                //Log.d(LOG_TAG, "The thumnail for the movie: " + baseImgURL+sizeImg+thumbnail);
             }
             for (String s : resultStrs) {
                 Log.v(LOG_TAG, "Movie entry: " + s);

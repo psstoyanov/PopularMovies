@@ -24,16 +24,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-public class WeatherProvider extends ContentProvider {
+public class MoviesProvider extends ContentProvider {
 
     // The URI Matcher used by this content provider.
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private MoviesDBHelper mOpenHelper;
 
-    static final int WEATHER = 100;
-    static final int WEATHER_WITH_LOCATION = 101;
-    static final int WEATHER_WITH_LOCATION_AND_DATE = 102;
-    static final int LOCATION = 300;
+    static final int MOVIES = 100;
+    static final int MOVIES_WITH_SORT_ORDER = 101;
+    static final int MOVIES_WITH_SORT_ORDER_AND_DATE = 102;
+    static final int SORT_ORDER = 300;
 
     private static final SQLiteQueryBuilder sWeatherByLocationSettingQueryBuilder;
 
@@ -69,7 +69,7 @@ public class WeatherProvider extends ContentProvider {
                     MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE + " = ? ";
 
     private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
-        String locationSetting = MoviesContract.MoviesEntry.getLocationSettingFromUri(uri);
+        String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
         long startDate = MoviesContract.MoviesEntry.getStartDateFromUri(uri);
 
         String[] selectionArgs;
@@ -95,7 +95,7 @@ public class WeatherProvider extends ContentProvider {
 
     private Cursor getWeatherByLocationSettingAndDate(
             Uri uri, String[] projection, String sortOrder) {
-        String locationSetting = MoviesContract.MoviesEntry.getLocationSettingFromUri(uri);
+        String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
         long date = MoviesContract.MoviesEntry.getDateFromUri(uri);
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
@@ -110,21 +110,40 @@ public class WeatherProvider extends ContentProvider {
 
     /*
         Students: Here is where you need to create the UriMatcher. This UriMatcher will
-        match each URI to the WEATHER, WEATHER_WITH_LOCATION, WEATHER_WITH_LOCATION_AND_DATE,
-        and LOCATION integer constants defined above.  You can test this by uncommenting the
+        match each URI to the MOVIES, MOVIES_WITH_SORT_ORDER, MOVIES_WITH_SORT_ORDER_AND_DATE,
+        and SORT_ORDER integer constants defined above.  You can test this by uncommenting the
         testUriMatcher test within TestUriMatcher.
      */
     static UriMatcher buildUriMatcher() {
         // 1) The code passed into the constructor represents the code to return for the root
         // URI.  It's common to use NO_MATCH as the code for this case. Add the constructor below.
 
+        // Why create a UriMatcher when you can use regular
+        // expression instead? Because it is stupid...
+
+        // All paths added to the UriMatcher have a corresponding code to return
+        // when a match is found. The code passed into the constructor represents the code
+        // to return for the root URI. It's common to use NO_MATCH as the code for
+        // this case.
+        final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+
+        // For readability, this is a shortcut to the
+        // MoviesContract.CONTENT_AUTHORITY.
+        final String authority = MoviesContract.CONTENT_AUTHORITY;
+
 
         // 2) Use the addURI function to match each of the types.  Use the constants from
         // MoviesContract to help define the types to the UriMatcher.
 
+        // For each type of URI we want to add, create a corresponding code.
+        matcher.addURI(authority, MoviesContract.PATH_MOVIES, MOVIES);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*", MOVIES_WITH_SORT_ORDER);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*/#", MOVIES_WITH_SORT_ORDER_AND_DATE);
+
 
         // 3) Return the new matcher!
-        return null;
+        matcher.addURI(authority, MoviesContract.PATH_SORT_ORDER, SORT_ORDER);
+        return matcher;
     }
 
     /*
@@ -150,11 +169,13 @@ public class WeatherProvider extends ContentProvider {
 
         switch (match) {
             // Student: Uncomment and fill out these two cases
-//            case WEATHER_WITH_LOCATION_AND_DATE:
-//            case WEATHER_WITH_LOCATION:
-            case WEATHER:
+            case MOVIES_WITH_SORT_ORDER_AND_DATE:
+                return MoviesContract.MoviesEntry.CONTENT_ITEM_TYPE;
+            case MOVIES_WITH_SORT_ORDER:
                 return MoviesContract.MoviesEntry.CONTENT_TYPE;
-            case LOCATION:
+            case MOVIES:
+                return MoviesContract.MoviesEntry.CONTENT_TYPE;
+            case SORT_ORDER:
                 return MoviesContract.SortEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -169,23 +190,23 @@ public class WeatherProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             // "weather/*/*"
-            case WEATHER_WITH_LOCATION_AND_DATE:
+            case MOVIES_WITH_SORT_ORDER_AND_DATE:
             {
                 retCursor = getWeatherByLocationSettingAndDate(uri, projection, sortOrder);
                 break;
             }
             // "weather/*"
-            case WEATHER_WITH_LOCATION: {
+            case MOVIES_WITH_SORT_ORDER: {
                 retCursor = getWeatherByLocationSetting(uri, projection, sortOrder);
                 break;
             }
             // "weather"
-            case WEATHER: {
+            case MOVIES: {
                 retCursor = null;
                 break;
             }
             // "location"
-            case LOCATION: {
+            case SORT_ORDER: {
                 retCursor = null;
                 break;
             }
@@ -207,11 +228,11 @@ public class WeatherProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case WEATHER: {
+            case MOVIES: {
                // normalizeDate(values);
                 long _id = db.insert(MoviesContract.MoviesEntry.TABLE_NAME, null, values);
                 if ( _id > 0 )
-                    returnUri = MoviesContract.MoviesEntry.buildWeatherUri(_id);
+                    returnUri = MoviesContract.MoviesEntry.buildMoviesUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -227,7 +248,7 @@ public class WeatherProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         // Student: Start by getting a writable database
 
-        // Student: Use the uriMatcher to match the WEATHER and LOCATION URI's we are going to
+        // Student: Use the uriMatcher to match the MOVIES and SORT_ORDER URI's we are going to
         // handle.  If it doesn't match these, throw an UnsupportedOperationException.
 
         // Student: A null value deletes all rows.  In my implementation of this, I only notified
@@ -260,7 +281,7 @@ public class WeatherProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {
-            case WEATHER:
+            case MOVIES:
                 db.beginTransaction();
                 int returnCount = 0;
                 try {

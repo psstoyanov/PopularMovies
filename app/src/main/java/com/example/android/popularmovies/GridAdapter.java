@@ -105,7 +105,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
         //Add a fit and center function from Picasso
         //Also changed how the view itself will handle it.
-        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.passage_wallpaper)
+        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.blank_thumbnail)
                 .fit().centerInside().into(viewHolder.imgThumbnail);
 
         //Picasso.with(viewHolder.imgThumbnail.getContext()).load(R.drawable.grid_item_mock).into(viewHolder.imgThumbnail);

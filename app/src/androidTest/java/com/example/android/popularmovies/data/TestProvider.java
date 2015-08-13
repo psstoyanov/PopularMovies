@@ -15,10 +15,14 @@
  */
 package com.example.android.popularmovies.data;
 
+import android.content.ComponentName;
 import android.content.ContentValues;
+import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
+import android.util.Log;
 
 import com.example.android.popularmovies.data.MoviesContract.SortEntry;
 import com.example.android.popularmovies.data.MoviesContract.MoviesEntry;
@@ -108,30 +112,30 @@ public class TestProvider extends AndroidTestCase {
 
     /*
         This test checks to make sure that the content provider is registered correctly.
-        Students: Uncomment this test to make sure you've correctly registered the WeatherProvider.
+        Students: Uncomment this test to make sure you've correctly registered the MoviesProvider.
      */
-//    public void testProviderRegistry() {
-//        PackageManager pm = mContext.getPackageManager();
-//
-//        // We define the component name based on the package name from the context and the
-//        // WeatherProvider class.
-//        ComponentName componentName = new ComponentName(mContext.getPackageName(),
-//                WeatherProvider.class.getName());
-//        try {
-//            // Fetch the provider info using the component name from the PackageManager
-//            // This throws an exception if the provider isn't registered.
-//            ProviderInfo providerInfo = pm.getProviderInfo(componentName, 0);
-//
-//            // Make sure that the registered authority matches the authority from the Contract.
-//            assertEquals("Error: WeatherProvider registered with authority: " + providerInfo.authority +
-//                    " instead of authority: " + MoviesContract.CONTENT_AUTHORITY,
-//                    providerInfo.authority, MoviesContract.CONTENT_AUTHORITY);
-//        } catch (PackageManager.NameNotFoundException e) {
-//            // I guess the provider isn't registered correctly.
-//            assertTrue("Error: WeatherProvider not registered at " + mContext.getPackageName(),
-//                    false);
-//        }
-//    }
+    public void testProviderRegistry() {
+        PackageManager pm = mContext.getPackageManager();
+
+        // We define the component name based on the package name from the context and the
+        // MoviesProvider class.
+        ComponentName componentName = new ComponentName(mContext.getPackageName(),
+                MoviesProvider.class.getName());
+        try {
+            // Fetch the provider info using the component name from the PackageManager
+            // This throws an exception if the provider isn't registered.
+            ProviderInfo providerInfo = pm.getProviderInfo(componentName, 0);
+
+            // Make sure that the registered authority matches the authority from the Contract.
+            assertEquals("Error: MoviesProvider registered with authority: " + providerInfo.authority +
+                    " instead of authority: " + MoviesContract.CONTENT_AUTHORITY,
+                    providerInfo.authority, MoviesContract.CONTENT_AUTHORITY);
+        } catch (PackageManager.NameNotFoundException e) {
+            // I guess the provider isn't registered correctly.
+            assertTrue("Error: MoviesProvider not registered at " + mContext.getPackageName(),
+                    false);
+        }
+    }
 
     /*
             This test doesn't touch the database.  It verifies that the ContentProvider returns
@@ -139,35 +143,36 @@ public class TestProvider extends AndroidTestCase {
             Students: Uncomment this test to verify that your implementation of GetType is
             functioning correctly.
          */
-//    public void testGetType() {
-//        // content://com.example.android.sunshine.app/weather/
-//        String type = mContext.getContentResolver().getType(MoviesEntry.CONTENT_URI);
-//        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
-//        assertEquals("Error: the MoviesEntry CONTENT_URI should return MoviesEntry.CONTENT_TYPE",
-//                MoviesEntry.CONTENT_TYPE, type);
-//
-//        String testLocation = "94074";
-//        // content://com.example.android.sunshine.app/weather/94074
-//        type = mContext.getContentResolver().getType(
-//                MoviesEntry.buildWeatherLocation(testLocation));
-//        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
-//        assertEquals("Error: the MoviesEntry CONTENT_URI with location should return MoviesEntry.CONTENT_TYPE",
-//                MoviesEntry.CONTENT_TYPE, type);
-//
-//        long testDate = 1419120000L; // December 21st, 2014
-//        // content://com.example.android.sunshine.app/weather/94074/20140612
-//        type = mContext.getContentResolver().getType(
-//                MoviesEntry.buildWeatherLocationWithDate(testLocation, testDate));
-//        // vnd.android.cursor.item/com.example.android.sunshine.app/weather/1419120000
-//        assertEquals("Error: the MoviesEntry CONTENT_URI with location and date should return MoviesEntry.CONTENT_ITEM_TYPE",
-//                MoviesEntry.CONTENT_ITEM_TYPE, type);
-//
-//        // content://com.example.android.sunshine.app/location/
-//        type = mContext.getContentResolver().getType(SortEntry.CONTENT_URI);
-//        // vnd.android.cursor.dir/com.example.android.sunshine.app/location
-//        assertEquals("Error: the SortEntry CONTENT_URI should return SortEntry.CONTENT_TYPE",
-//                SortEntry.CONTENT_TYPE, type);
-//    }
+    public void testGetType() {
+        // content://com.example.android.sunshine.app/weather/
+        String type = mContext.getContentResolver().getType(MoviesEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        assertEquals("Error: the MoviesEntry CONTENT_URI should return MoviesEntry.CONTENT_TYPE",
+                MoviesEntry.CONTENT_TYPE, type);
+
+        String testLocation = "94074";
+        // content://com.example.android.sunshine.app/weather/94074
+        type = mContext.getContentResolver().getType(
+                MoviesEntry.buildMoviesSortorder(testLocation));
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/weather
+        assertEquals("Error: the MoviesEntry CONTENT_URI with location should return MoviesEntry.CONTENT_TYPE",
+                MoviesEntry.CONTENT_TYPE, type);
+
+        long testDate = 1419120000L; // December 21st, 2014
+        // content://com.example.android.sunshine.app/weather/94074/20140612
+        type = mContext.getContentResolver().getType(
+                MoviesEntry.buildWeatherLocationWithDate(testLocation, testDate));
+        // vnd.android.cursor.item/com.example.android.sunshine.app/weather/1419120000
+        assertEquals("Error: the MoviesEntry CONTENT_URI with location and date should return MoviesEntry.CONTENT_ITEM_TYPE",
+                MoviesEntry.CONTENT_ITEM_TYPE, type);
+
+        // content://com.example.android.sunshine.app/location/
+        type = mContext.getContentResolver().getType(SortEntry.CONTENT_URI);
+        // vnd.android.cursor.dir/com.example.android.sunshine.app/location
+        assertEquals("Error: the SortEntry CONTENT_URI should return SortEntry.CONTENT_TYPE",
+                SortEntry.CONTENT_TYPE, type);
+        Log.d(LOG_TAG," Test Provider testGetType is all done.");
+    }
 
 
     /*
@@ -367,7 +372,7 @@ public class TestProvider extends AndroidTestCase {
 //
 //        // Get the joined Weather and Location data
 //        weatherCursor = mContext.getContentResolver().query(
-//                MoviesEntry.buildWeatherLocation(TestUtilities.TEST_LOCATION),
+//                MoviesEntry.buildMoviesSortorder(TestUtilities.TEST_LOCATION),
 //                null, // leaving "columns" null just returns all the columns.
 //                null, // cols for "where" clause
 //                null, // values for "where" clause
