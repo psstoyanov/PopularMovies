@@ -134,19 +134,24 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
         the UX expects so that we can continue to test the application even once we begin using
         the database.
      */
-    String[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
+    PopularMovieGridItem[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
         // return strings to keep UI functional for now
-        String[] resultStrs = new String[cvv.size()];
+        //String[] resultStrs = new String[cvv.size()];
+        PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[cvv.size()];
         for ( int i = 0; i < cvv.size(); i++ ) {
             ContentValues moviesValues = cvv.elementAt(i);
             String highAndLow = formatRating(
                     moviesValues.getAsDouble(MoviesEntry.COLUMN_POPULARITY));
-            resultStrs[i] =
-                    moviesValues.getAsString(MoviesEntry.COLUMN_RELEASE_DATE) +
-                    " - " + moviesValues.getAsString(MoviesEntry.COLUMN_OVERVIEW) +
-                    " - " + highAndLow;
+            resultMovies[i] = new PopularMovieGridItem();
+            resultMovies[i].setmThumbnail(moviesValues.getAsString(MoviesEntry.COLUMN_POSTER_PATH));
+            resultMovies[i].setmName(moviesValues.getAsString(MoviesEntry.COLUMN_MOVIE_TITLE));
+            //resultStrs[i] =
+            //        moviesValues.getAsString(MoviesEntry.COLUMN_RELEASE_DATE) +
+            //        " - " + moviesValues.getAsString(MoviesEntry.COLUMN_OVERVIEW) +
+            //        " - " + highAndLow;
+
         }
-        return resultStrs;
+        return resultMovies;
     }
 
     /**
@@ -196,7 +201,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
             Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
 
             //String[] resultStrs = new String[movieArray.length()];
-            PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[movieArray.length()];
+            //PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[movieArray.length()];
             // we start at the day returned by local time. Otherwise this is a mess.
             //int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
 
@@ -222,8 +227,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 String movie_thumbnail;
 
 
-                String description;
-                int weatherId;
+                //String description;
+                //int weatherId;
 
                 // Get the JSON object representing the movie
                 JSONObject movieObject = movieArray.getJSONObject(i);
@@ -261,9 +266,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 movie_thumbnail_base = movieObject.getString(MDB_POSTER);
                 movie_thumbnail = baseImgURL + sizeImg + movie_thumbnail_base;
 
-                resultMovies[i] = new PopularMovieGridItem();
-                resultMovies[i].setmName(movie_title);
-                resultMovies[i].setmThumbnail(movie_thumbnail);
+                //resultMovies[i] = new PopularMovieGridItem();
+                //resultMovies[i].setmName(movie_title);
+                //resultMovies[i].setmThumbnail(movie_thumbnail);
 
 
                 ContentValues moviesValues = new ContentValues();
@@ -291,15 +296,15 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
             // Sort order:  Ascending, by date.
              String sortOrder = MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC";
              //Uri weatherForLocationUri = MoviesEntry.buildWeatherLocationWithStartDate(
-             Uri weatherForLocationUri = MoviesEntry.buildMoviesSortorder(
-             sortSetting);
+             Uri moviesWithSortOrderUri = MoviesEntry.buildMoviesSortorder(
+                     sortSetting);
 
             // Students: Uncomment the next lines to display what what you stored in the bulkInsert
 
             //Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
             //        null, null, null, sortOrder);
-            Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
-                    null, null, null, sortOrder);
+            Cursor cur = mContext.getContentResolver().query(moviesWithSortOrderUri,
+                    null, null, null, null);
 
             cVVector = new Vector<ContentValues>(cur.getCount());
             if ( cur.moveToFirst() ) {
@@ -312,11 +317,13 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
 
             Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
 
-            String[] resultStrs = convertContentValuesToUXFormat(cVVector);
+            //String[] resultStrs = convertContentValuesToUXFormat(cVVector);
+            PopularMovieGridItem[] resultMovies = convertContentValuesToUXFormat(cVVector);
             /*for (PopularMovieGridItem movieItemStr : resultMovies)
             {
                 Log.d(LOG_TAG, movieItemStr.getmName());
             }*/
+
 
             return resultMovies;
 
