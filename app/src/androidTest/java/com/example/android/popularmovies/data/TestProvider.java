@@ -451,11 +451,11 @@ public class TestProvider extends AndroidTestCase {
 
     static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
     static ContentValues[] createBulkInsertmoviesValues(long sortorderRowId) {
-        String currentTestDate = TestUtilities.TEST_SORT_ORDER;
-        long millisecondsInADay = 1000*60*60*24;
+        //String currentTestDate = TestUtilities.TEST_SORT_ORDER;
+        //long millisecondsInADay = 1000*60*60*24;
         ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
 
-        for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++, currentTestDate+= millisecondsInADay ) {
+        for ( int i = 0; i < BULK_INSERT_RECORDS_TO_INSERT; i++) {
             ContentValues moviesValues = new ContentValues();
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortorderRowId);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, "2015");
@@ -505,16 +505,16 @@ public class TestProvider extends AndroidTestCase {
         ContentValues[] bulkInsertContentValues = createBulkInsertmoviesValues(locationRowId);
 
         // Register a content observer for our bulk insert.
-        TestUtilities.TestContentObserver weatherObserver = TestUtilities.getTestContentObserver();
-        mContext.getContentResolver().registerContentObserver(MoviesEntry.CONTENT_URI, true, weatherObserver);
+        TestUtilities.TestContentObserver moviesObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(MoviesEntry.CONTENT_URI, true, moviesObserver);
 
         int insertCount = mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI, bulkInsertContentValues);
 
         // Students:  If this fails, it means that you most-likely are not calling the
         // getContext().getContentResolver().notifyChange(uri, null); in your BulkInsert
         // ContentProvider method.
-        weatherObserver.waitForNotificationOrFail();
-        mContext.getContentResolver().unregisterContentObserver(weatherObserver);
+        moviesObserver.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(moviesObserver);
 
         assertEquals(insertCount, BULK_INSERT_RECORDS_TO_INSERT);
 
@@ -524,7 +524,7 @@ public class TestProvider extends AndroidTestCase {
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
                 null, // values for "where" clause
-                MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC"  // sort order == by DATE ASCENDING
+                null // sort order == by DATE ASCENDING
         );
 
         // we should have as many records in the database as we've inserted
