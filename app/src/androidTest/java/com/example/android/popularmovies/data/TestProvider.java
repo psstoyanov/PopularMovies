@@ -450,7 +450,8 @@ public class TestProvider extends AndroidTestCase {
 
 
     static private final int BULK_INSERT_RECORDS_TO_INSERT = 10;
-    static ContentValues[] createBulkInsertmoviesValues(long sortorderRowId) {
+    static ContentValues[] createBulkInsertmoviesValues(long sortorderRowId)
+    {
         //String currentTestDate = TestUtilities.TEST_SORT_ORDER;
         //long millisecondsInADay = 1000*60*60*24;
         ContentValues[] returnContentValues = new ContentValues[BULK_INSERT_RECORDS_TO_INSERT];
@@ -517,7 +518,6 @@ public class TestProvider extends AndroidTestCase {
         mContext.getContentResolver().unregisterContentObserver(moviesObserver);
 
         assertEquals(insertCount, BULK_INSERT_RECORDS_TO_INSERT);
-
         // A cursor is your primary interface to the query results.
         cursor = mContext.getContentResolver().query(
                 MoviesEntry.CONTENT_URI,

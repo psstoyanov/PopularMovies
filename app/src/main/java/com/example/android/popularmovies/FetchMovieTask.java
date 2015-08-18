@@ -190,12 +190,11 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
 
             //JSONObject cityJson = moviesdataJson.getJSONObject(OWM_CITY);
             //String cityName = cityJson.getString(OWM_CITY_NAME);
-
             //JSONObject cityCoord = cityJson.getJSONObject(OWM_COORD);
             //double cityLatitude = cityCoord.getDouble(OWM_LATITUDE);
             //double cityLongitude = cityCoord.getDouble(OWM_LONGITUDE);
 
-            String sortorderID = (sortSetting);
+            long sortorderID = addsortOrder(sortSetting);
 
             // Insert the new weather information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(movieArray.length());
@@ -286,28 +285,33 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
 
             // add to database
             if (cVVector.size() > 0) {
+                Log.d(LOG_TAG, String.valueOf(cVVector.size()));
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
-
                 cVVector.toArray(cvArray);
-                mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI,cvArray);
+                mContext.getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
             }
 
             // Sort order:  Ascending, by date.
-             String sortOrder = MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC";
+            // String sortOrder = MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC";
              //Uri weatherForLocationUri = MoviesEntry.buildWeatherLocationWithStartDate(
-             Uri moviesWithSortOrderUri = MoviesEntry.buildMoviesSortorder(
-                     sortSetting);
+             Uri moviesWithSortOrderUri = MoviesEntry.buildMoviesSortorder(sortSetting);
 
             // Students: Uncomment the next lines to display what what you stored in the bulkInsert
 
             //Cursor cur = mContext.getContentResolver().query(weatherForLocationUri,
             //        null, null, null, sortOrder);
             Cursor cur = mContext.getContentResolver().query(moviesWithSortOrderUri,
-                    null, null, null, null);
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            Log.d(LOG_TAG, String.valueOf(cur.getCount()));
 
             cVVector = new Vector<ContentValues>(cur.getCount());
-            if ( cur.moveToFirst() ) {
+            if ( cur.moveToFirst() )
+            {
                 do {
                     ContentValues cv = new ContentValues();
                     DatabaseUtils.cursorRowToContentValues(cur, cv);

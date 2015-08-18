@@ -300,12 +300,12 @@ public class MoviesProvider extends ContentProvider {
         int rowsDeleted;
 
         // This makes delete all rows return the number of rows deleted.
-        if ( null == selection ) selection = "1";
+        if (null == selection) selection = "1";
         switch (match) {
             // Student: Use the uriMatcher to match the MOVIES and SORT_ORDER URI's we are going to
             // handle.  If it doesn't match these, throw an UnsupportedOperationException.
             case MOVIES:
-                rowsDeleted = db.delete(MoviesContract.MoviesEntry.TABLE_NAME, selection , selectionArgs);
+                rowsDeleted = db.delete(MoviesContract.MoviesEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case SORT_ORDER:
                 rowsDeleted = db.delete(MoviesContract.SortEntry.TABLE_NAME, selection, selectionArgs);
@@ -342,20 +342,18 @@ public class MoviesProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsUpdated;
 
-        switch (match)
-        {
+        switch (match) {
             case MOVIES:
-                rowsUpdated = db.update(MoviesContract.MoviesEntry.TABLE_NAME,values,selection,selectionArgs);
+                rowsUpdated = db.update(MoviesContract.MoviesEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             case SORT_ORDER:
-                rowsUpdated = db.update(MoviesContract.SortEntry.TABLE_NAME,values,selection,selectionArgs);
+                rowsUpdated = db.update(MoviesContract.SortEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unkown uri: " + uri);
         }
-        if (rowsUpdated !=0)
-        {
-            getContext().getContentResolver().notifyChange(uri,null);
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
         }
         // Student: return the actual rows deleted
         return rowsUpdated;
