@@ -73,7 +73,8 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
 
                 // To assure the application have just one movie entry from the database
                 // per sort order, it's created a UNIQUE constraint with REPLACE strategy
-                " UNIQUE (" + MoviesEntry.COLUMN_SORT_KEY + ") ON CONFLICT REPLACE);";
+                " UNIQUE (" + MoviesEntry.COLUMN_MOVIE_TITLE + ", " +
+                MoviesEntry.COLUMN_SORT_KEY + ") ON CONFLICT REPLACE);";
 
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIES_TABLE);

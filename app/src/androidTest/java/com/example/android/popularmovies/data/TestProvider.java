@@ -461,7 +461,7 @@ public class TestProvider extends AndroidTestCase {
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortorderRowId);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, "2015");
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, 1.1);
-            moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, "Despicable me");
+            moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, "Despicable me" + i);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, "Asteroids");
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POPULARITY, 1.2);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE, 1.3);

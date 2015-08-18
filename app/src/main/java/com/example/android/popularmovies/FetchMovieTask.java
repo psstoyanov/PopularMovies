@@ -289,7 +289,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                mContext.getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
+                mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI, cvArray);
             }
 
             // Sort order:  Ascending, by date.
