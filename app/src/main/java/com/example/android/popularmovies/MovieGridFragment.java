@@ -1,14 +1,16 @@
 package com.example.android.popularmovies;
 
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
+import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,25 +18,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.example.android.popularmovies.data.MoviesContract;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieGridFragment extends Fragment {
+public class MovieGridFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+
+    private static final int DISCOVER_MOVIES_LOADER = 0;
 
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
-    GridAdapter mAdapter;
+    GridRecyclerViewAdapter mAdapter;
 
 
     public MovieGridFragment() {
@@ -59,7 +55,7 @@ public class MovieGridFragment extends Fragment {
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new GridAdapter();
+        mAdapter = new GridRecyclerViewAdapter(getActivity(),null);
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -88,11 +84,18 @@ public class MovieGridFragment extends Fragment {
     }
     private void updateMovieData()
     {
-        FetchMovieTask movieTask = new FetchMovieTask(getActivity(),mAdapter);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        String sortorder = prefs.getString(getString(R.string.pref_sort_key),
-                getString(R.string.pref_order_popularity));
-        movieTask.execute(sortorder);
+        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        //String sortorder = prefs.getString(getString(R.string.pref_sort_key),
+        //        getString(R.string.pref_order_popularity));
+        String sortOrder = Utility.getPreferredLocation(getActivity());
+        movieTask.execute(sortOrder);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(DISCOVER_MOVIES_LOADER, null, this);
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -101,6 +104,33 @@ public class MovieGridFragment extends Fragment {
         super.onStart();
         updateMovieData();
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        String sortSetting = Utility.getPreferredLocation(getActivity());
+
+        Uri discoverMoviesWithSortOrder = MoviesContract.MoviesEntry.buildMoviesSortorder(sortSetting);
+
+        return new CursorLoader(getActivity(),
+                discoverMoviesWithSortOrder,
+                null,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        //mForecastAdapter.swapCursor(cursor);
+        mAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mAdapter.swapCursor(null);
+    }
+
+
 
     /*public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]> {
 

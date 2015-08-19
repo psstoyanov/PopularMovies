@@ -42,7 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Vector;
 
-public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem[]> {
+public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     private final String ratingMax = "10.0";
@@ -52,9 +52,9 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
     private ArrayAdapter<String> mMoviesAdapter;
     private final Context mContext;
 
-    public FetchMovieTask(Context context, GridAdapter moviesAdapter) {
+    public FetchMovieTask(Context context) {
         mContext = context;
-        mAdapter = moviesAdapter;
+        //mAdapter = moviesAdapter;
     }
 
     private boolean DEBUG = true;
@@ -64,9 +64,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
      * Prepare the movie rating for presentation.
      * @param userrating
      */
-    private String formatRating(Double userrating) {
-
-
+    /*private String formatRating(Double userrating) {
         return Double.toString(userrating) + "/" + ratingMax;
     }
     private String getReadableDateString(long time){
@@ -75,7 +73,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
         Date date = new Date(time);
         SimpleDateFormat format = new SimpleDateFormat("E, MMM d");
         return format.format(date).toString();
-    }
+    }*/
 
 
     /**
@@ -134,7 +132,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
         the UX expects so that we can continue to test the application even once we begin using
         the database.
      */
-    PopularMovieGridItem[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
+    //Udacity 4C Loaders
+    /*PopularMovieGridItem[] convertContentValuesToUXFormat(Vector<ContentValues> cvv) {
         // return strings to keep UI functional for now
         //String[] resultStrs = new String[cvv.size()];
         PopularMovieGridItem[] resultMovies = new PopularMovieGridItem[cvv.size()];
@@ -152,7 +151,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
 
         }
         return resultMovies;
-    }
+    }*/
 
     /**
      * Take the String representing the complete forecast in JSON Format and
@@ -161,7 +160,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private PopularMovieGridItem[] getMoviesDataFromJson(String moviesdataJsonStr, String sortSetting)
+    private Void getMoviesDataFromJson(String moviesdataJsonStr, String sortSetting)
             throws JSONException {
 
         // Now we have a String representing the complete forecast in JSON Format.
@@ -278,10 +277,12 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 moviesValues.put(MoviesEntry.COLUMN_OVERVIEW, movie_overview);
                 moviesValues.put(MoviesEntry.COLUMN_POSTER_PATH, movie_thumbnail);
                 moviesValues.put(MoviesEntry.COLUMN_POPULARITY, movie_popularity);
-                moviesValues.put(MoviesEntry.COLUMN_VOTE_AVERAGE, formatRating((double) movie_rating));
+                moviesValues.put(MoviesEntry.COLUMN_VOTE_AVERAGE, Utility.formatRating(movie_rating));
                 moviesValues.put(MoviesEntry.COLUMN_RELEASE_DATE, movie_release_date);
                 cVVector.add(moviesValues);
             }
+
+            int inserted = 0;
 
             // add to database
             if (cVVector.size() > 0) {
@@ -289,10 +290,10 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
-                mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI, cvArray);
+                inserted = mContext.getContentResolver().bulkInsert(MoviesEntry.CONTENT_URI, cvArray);
             }
 
-            // Sort order:  Ascending, by date.
+            /*// Sort order:  Ascending, by date.
             // String sortOrder = MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC";
              //Uri weatherForLocationUri = MoviesEntry.buildWeatherLocationWithStartDate(
              Uri moviesWithSortOrderUri = MoviesEntry.buildMoviesSortorder(sortSetting);
@@ -317,19 +318,20 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                     DatabaseUtils.cursorRowToContentValues(cur, cv);
                     cVVector.add(cv);
                 } while (cur.moveToNext());
-            }
+            }*/
 
-            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
+            //Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVVector.size() + " Inserted");
+            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
 
             //String[] resultStrs = convertContentValuesToUXFormat(cVVector);
-            PopularMovieGridItem[] resultMovies = convertContentValuesToUXFormat(cVVector);
+            //PopularMovieGridItem[] resultMovies = convertContentValuesToUXFormat(cVVector);
             /*for (PopularMovieGridItem movieItemStr : resultMovies)
             {
                 Log.d(LOG_TAG, movieItemStr.getmName());
             }*/
 
 
-            return resultMovies;
+            //return resultMovies;
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
@@ -339,7 +341,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
     }
 
     @Override
-    protected PopularMovieGridItem[] doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
 
         // If there's no zip code, there's nothing to look up.  Verify size of params.
         if (params.length == 0) {
@@ -411,13 +413,16 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                 return null;
             }
             moviedbJsonStr = buffer.toString();
+            getMoviesDataFromJson(moviedbJsonStr, sortQuery);
             Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
             // If the code didn't successfully get the weather data, there's no point in attemping
             // to parse it.
-            return null;
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -431,13 +436,13 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
             }
         }
 
-        try {
+        /*try {
             return getMoviesDataFromJson(moviedbJsonStr, sortQuery);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
-        // This will only happen if there was an error getting or parsing the forecast.
+        // This will only happen if there was an error getting or parsing the forecast.*/
         return null;
     }
 
@@ -451,7 +456,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
             // New data is back from the server.  Hooray!
         }
     }*/
-    @Override
+    /*@Override
     protected void onPostExecute(PopularMovieGridItem[] results)
     {
         if (results != null && mAdapter != null)
@@ -468,14 +473,14 @@ public class FetchMovieTask extends AsyncTask<String, Void, PopularMovieGridItem
                     }
                 //Log.d(LOG_TAG, " Results size: " + results.length);
                 //Log.d(LOG_TAG, results.toString());
-                /*for (int y = 0; y < results.length; y++)
-                {
-                    PopularMovieGridItem newMovie = new PopularMovieGridItem();
-                    newMovie.setmName(results[y].getmName());
-                    newMovie.setmThumbnail(results[y].getThumbnail());
-                    mAdapter.add(newMovie);
-                }*/
+               //for (int y = 0; y < results.length; y++)
+               //{
+               //    PopularMovieGridItem newMovie = new PopularMovieGridItem();
+               //    newMovie.setmName(results[y].getmName());
+               //    newMovie.setmThumbnail(results[y].getThumbnail());
+               //    mAdapter.add(newMovie);
+               //}
             //}
         }
-    }
+    }*/
 }

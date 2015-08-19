@@ -1,5 +1,9 @@
 package com.example.android.popularmovies;
 
+import android.database.Cursor;
+
+import com.example.android.popularmovies.data.MoviesContract;
+
 /**
  * Created by Raz3r on 29/07/15.
  */
@@ -26,6 +30,17 @@ public class PopularMovieGridItem
     public void setmThumbnail(String thumbnail)
     {
         this.mThumbnail = thumbnail;
+    }
+
+    public static PopularMovieGridItem fromCursor(Cursor cursor)
+    {
+        PopularMovieGridItem newItem = new PopularMovieGridItem();
+        int idx_movie_title = cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
+        int idx_poster_path = cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH);
+
+        newItem.setmName(cursor.getString(idx_movie_title));
+        newItem.setmThumbnail(cursor.getString(idx_poster_path));
+        return newItem;
     }
 
 }
