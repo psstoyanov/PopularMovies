@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -21,22 +23,26 @@ import java.util.List;
  * The adapter for the RecyclerView.
  * It will display a grid of thumbnails and the respective movie names.
  */
-public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
+public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
 
 {
     private List<PopularMovieGridItem> mItems;
     private int itemLayout;
     private static final String TAG = "CustomAdapter";
+    Context mContext;
 
-    public GridAdapter()
+
+    public GridAdapter(Context context,Cursor cursor)
     {
-        super();
-        mItems = new ArrayList<>();
+        super(context,cursor);
+
+        mContext = context;
+        //mItems = new ArrayList<>();
 
         //Initializing the adapter with an empty object.
-        PopularMovieGridItem movies = new PopularMovieGridItem();
-        mItems.add(0, movies);
-        notifyItemInserted(0);
+        //PopularMovieGridItem movies = new PopularMovieGridItem();
+        //mItems.add(0, movies);
+        //notifyItemInserted(0);
 
 
         /*for (int i = 0; i < 15; i++)
@@ -92,7 +98,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
         return viewHolder;
     }
 
-    @Override
+    /*@Override
     public void onBindViewHolder(ViewHolder viewHolder, int i)
     {
         PopularMovieGridItem movielist = mItems.get(i);
@@ -110,14 +116,33 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
 
         //Picasso.with(viewHolder.imgThumbnail.getContext()).load(R.drawable.grid_item_mock).into(viewHolder.imgThumbnail);
 
-    }
+    }*/
 
     @Override
+    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor)
+    {
+
+        PopularMovieGridItem movielist = PopularMovieGridItem.fromCursor(cursor);
+        //Log.d(TAG, "viewHolder pos: " + String.valueOf(viewHolder.getItemId()));
+        //Log.d(TAG, "Cursor pos: "+ String.valueOf(cursor.getPosition()));
+        viewHolder.tvtitles.setText(movielist.getmName());
+
+        //viewHolder.imgThumbnail.setImageResource(movielist.getThumbnail());
+
+        //Use psso to load an image.
+        Picasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
+        //Add a fit and center function from Picasso
+        //Also changed how the view itself will handle it.
+        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.blank_thumbnail)
+                .fit().centerInside().into(viewHolder.imgThumbnail);
+    }
+
+    /*@Override
     public int getItemCount()
     {
 
         return mItems.size();
-    }
+    }*/
 
 
     class ViewHolder extends RecyclerView.ViewHolder
@@ -135,7 +160,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
             tvtitles = (TextView) itemView.findViewById(R.id.tv_movie_title);
 
             /*  onClickListener for separate items from the adapter. Use: http://antonioleiva.com/recyclerview/*/
-            itemView.setOnClickListener(new View.OnClickListener() {
+            /*itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
                 {
@@ -149,7 +174,7 @@ public class GridAdapter extends RecyclerView.Adapter<GridAdapter.ViewHolder>
                     mContext.startActivity(intent);
                     Toast.makeText(itemView.getContext(),"Recycler View" + getAdapterPosition() + " clicked",Toast.LENGTH_SHORT).show();
                 }
-            });
+            });*/
         }
 
 

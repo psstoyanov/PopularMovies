@@ -30,7 +30,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
-    GridRecyclerViewAdapter mAdapter;
+    GridAdapter mAdapter;
 
 
     public MovieGridFragment() {
@@ -55,7 +55,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new GridRecyclerViewAdapter(getActivity(),null);
+        mAdapter = new GridAdapter(getActivity(),null);
         mRecyclerView.setAdapter(mAdapter);
 
 
