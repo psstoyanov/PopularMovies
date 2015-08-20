@@ -35,11 +35,11 @@ public class PopularMovieGridItem
     public static PopularMovieGridItem fromCursor(Cursor cursor)
     {
         PopularMovieGridItem newItem = new PopularMovieGridItem();
-        int idx_movie_title = cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
-        int idx_poster_path = cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH);
+        //int idx_movie_title = cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
+        //int idx_poster_path = cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH);
 
-        newItem.setmName(cursor.getString(idx_movie_title));
-        newItem.setmThumbnail(cursor.getString(idx_poster_path));
+        newItem.setmName(cursor.getString(MovieGridFragment.COL_MOVIE_TITLE));
+        newItem.setmThumbnail(cursor.getString(MovieGridFragment.COL_POSTER_PATH));
         return newItem;
     }
 

@@ -28,6 +28,37 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     private static final int DISCOVER_MOVIES_LOADER = 0;
 
+    // Specify the columns we need.
+    private static final String[] DISCOVER_MOVIES_COLUMNS = {
+            // In this case the id needs to be fully qualified with a table name, since
+            // the content provider joins the location & weather tables in the background
+            // (both have an _id column)
+            // On the one hand, that's annoying.  On the other, you can search the weather table
+            // using the location set by the user, which is only in the Location table.
+            // So the convenience is worth it.
+            MoviesContract.MoviesEntry.TABLE_NAME + "." + MoviesContract.MoviesEntry._ID,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_ID,
+            MoviesContract.MoviesEntry.COLUMN_OVERVIEW,
+            MoviesContract.MoviesEntry.COLUMN_POSTER_PATH,
+            MoviesContract.SortEntry.COLUMN_SORT_SETTING,
+            MoviesContract.MoviesEntry.COLUMN_POPULARITY,
+            MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE,
+            MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE,
+    };
+
+    // These indices are tied to DISCOVER_MOVIES_COLUMNS.  If DISCOVER_MOVIES_COLUMNS changes, these
+    // must change.
+    static final int COL_MOVIES_ID = 0;
+    static final int COL_MOVIE_TITLE = 1;
+    static final int COL_MOVIE_ID = 2;
+    static final int COL_OVERVIEW = 3;
+    static final int COL_POSTER_PATH= 4;
+    static final int COL__SORT_SETTING = 5;
+    static final int COL_POPULARITY = 6;
+    static final int COL_VOTE_AVERAGE = 7;
+    static final int COL_RELEASE_DATE = 8;
+
     RecyclerView mRecyclerView;
     RecyclerView.LayoutManager mLayoutManager;
     GridAdapter mAdapter;
@@ -55,9 +86,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new GridAdapter(getActivity(),null);
+        mAdapter = new GridAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
-
 
 
         return view;
@@ -82,8 +112,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         }
         return super.onOptionsItemSelected(item);
     }
-    private void updateMovieData()
-    {
+
+    private void updateMovieData() {
         FetchMovieTask movieTask = new FetchMovieTask(getActivity());
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         //String sortorder = prefs.getString(getString(R.string.pref_sort_key),
@@ -99,8 +129,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onStart()
-    {
+    public void onStart() {
         super.onStart();
         updateMovieData();
     }
@@ -113,7 +142,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
         return new CursorLoader(getActivity(),
                 discoverMoviesWithSortOrder,
-                null,
+                DISCOVER_MOVIES_COLUMNS,
                 null,
                 null,
                 null);
@@ -138,8 +167,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         private final String ratingMax = "10.0";
 
         *//**
-         * Prepare the movie rating for presentation.
-         *//*
+     * Prepare the movie rating for presentation.
+     *//*
         private String formatRating(Float userrating) {
 
 
@@ -147,12 +176,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         }
 
         *//**
-         * Take the String representing the complete movielis in JSON Format and
-         * pull out the data we need to construct the Strings needed for the wireframes.
-         * <p/>
-         * Fortunately parsing is easy:  constructor takes the JSON string and converts it
-         * into an Object hierarchy for us.
-         *//*
+     * Take the String representing the complete movielis in JSON Format and
+     * pull out the data we need to construct the Strings needed for the wireframes.
+     * <p/>
+     * Fortunately parsing is easy:  constructor takes the JSON string and converts it
+     * into an Object hierarchy for us.
+     *//*
         private PopularMovieGridItem[] getMoviesDataFromJson(String moviesdataJsonStr, int numPages)
                 throws JSONException {
 

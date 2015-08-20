@@ -1,8 +1,10 @@
 package com.example.android.popularmovies;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,19 +26,18 @@ import java.util.List;
  * It will display a grid of thumbnails and the respective movie names.
  */
 public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
-
 {
     private List<PopularMovieGridItem> mItems;
     private int itemLayout;
     private static final String TAG = "CustomAdapter";
     Context mContext;
+    Cursor mCursor;
 
 
     public GridAdapter(Context context,Cursor cursor)
     {
-        super(context,cursor);
-
-        mContext = context;
+        super(context, cursor);
+        mCursor = cursor;
         //mItems = new ArrayList<>();
 
         //Initializing the adapter with an empty object.
@@ -91,10 +92,10 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i)
     {
-        View v = LayoutInflater.from(viewGroup.getContext())
+        View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.grid_item, viewGroup, false);
-
-        ViewHolder viewHolder = new ViewHolder(v);
+        ViewHolder viewHolder = new ViewHolder(view);
+        Log.d(TAG,"Cursor pos: "+ getCursor().getPosition());
         return viewHolder;
     }
 
@@ -160,21 +161,25 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
             tvtitles = (TextView) itemView.findViewById(R.id.tv_movie_title);
 
             /*  onClickListener for separate items from the adapter. Use: http://antonioleiva.com/recyclerview/*/
-            /*itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v)
                 {
                     Context mContext = itemView.getContext();
                     Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-                    PopularMovieGridItem itemToSend = mItems.get(getAdapterPosition());
-                    int i = getAdapterPosition();
+                    Log.d(TAG, "Element " + getCursor().moveToPosition(getAdapterPosition()) + " clicked.");
+                    Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_TITLE) + " clicked.");
 
-                    Intent intent = new Intent(mContext, DetailActivity.class)
-                            .putExtra(Intent.EXTRA_TEXT, itemToSend.getmName() + " " + itemToSend.getThumbnail());
-                    mContext.startActivity(intent);
-                    Toast.makeText(itemView.getContext(),"Recycler View" + getAdapterPosition() + " clicked",Toast.LENGTH_SHORT).show();
+                  //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_ID)  + " clicked.");
+                  //PopularMovieGridItem itemToSend = mItems.get(getAdapterPosition());
+                  //int i = getAdapterPosition();
+
+                  //Intent intent = new Intent(mContext, DetailActivity.class)
+                  //        .putExtra(Intent.EXTRA_TEXT, itemToSend.getmName() + " " + itemToSend.getThumbnail());
+                  //mContext.startActivity(intent);
+                  //Toast.makeText(itemView.getContext(),"Recycler View" + getAdapterPosition() + " clicked",Toast.LENGTH_SHORT).show();
                 }
-            });*/
+            });
         }
 
 

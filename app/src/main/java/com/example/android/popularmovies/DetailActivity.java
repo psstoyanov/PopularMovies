@@ -51,7 +51,7 @@ public class DetailActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
         {
-            startActivity(new Intent(this,SettingsActivity.class));
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
@@ -84,7 +84,11 @@ public class DetailActivity extends AppCompatActivity
             Intent intent = getActivity().getIntent();
             if(intent != null && intent.hasExtra(Intent.EXTRA_TEXT))
             {
-                 mMovieStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+                mMovieStr = intent.getStringExtra(Intent.EXTRA_TEXT);
+
+            }
+            if (null != mMovieStr)
+            {
                 ((TextView) rootView.findViewById(R.id.detail_text)).setText(mMovieStr);
             }
             return rootView;
@@ -125,8 +129,7 @@ public class DetailActivity extends AppCompatActivity
             {
                 mShareActioProvider.setShareIntent(createShareMovieIntent());
             }
-            else
-            {
+            else {
                 Log.d(LOG_TAG, "ShareActionProvider is null???");
             }
 
