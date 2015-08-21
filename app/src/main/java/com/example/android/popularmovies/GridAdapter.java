@@ -166,9 +166,11 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                    // Log.d(TAG, "Element " + getCursor().moveToPosition(getAdapterPosition()) + " clicked.");
                     //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_TITLE) + " clicked.");
                     String sortorderSetting = Utility.getPreferredSortOrder(mContext);
+                    getCursor().moveToFirst();
+                    getCursor().moveToPosition(getAdapterPosition());
                     Intent intent = new Intent(mContext, DetailActivity.class)
-                            .setData(MoviesContract.MoviesEntry.buildMoviesSortordernWithSpecificMovieID(
-                                    sortorderSetting, getCursor().getString(MovieGridFragment.COL_MOVIE_ID)
+                            .setData(MoviesContract.MoviesEntry.buildMovieSortOrderWithMovieID(
+                                    sortorderSetting, getCursor().getLong(MovieGridFragment.COL_MOVIE_ID)
                             ));
                     mContext.startActivity(intent);
                 }

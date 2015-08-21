@@ -72,27 +72,27 @@ public class MoviesProvider extends ContentProvider {
     private static final String sLocationSettingWithStartDateSelection =
             MoviesContract.SortEntry.TABLE_NAME +
                     "." + MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ? AND " +
-                    MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE + " >= ? ";
+                    MoviesContract.MoviesEntry.COLUMN_MOVIE_ID + " >= ? ";
 
     //location.location_setting = ? AND date = ?
     private static final String sLocationSettingAndDaySelection =
             MoviesContract.SortEntry.TABLE_NAME +
                     "." + MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ? AND " +
-                    MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE + " = ? ";
+                    MoviesContract.MoviesEntry.COLUMN_MOVIE_ID + " = ? ";
 
     // A function to get the movies by sort setting using the same query builder.
     private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
         String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
-        String startDate = MoviesContract.MoviesEntry.getTheMovieIDFromUri(uri);
+        long startDate = MoviesContract.MoviesEntry.getTheMovieIDFromUri(uri);
 
         String[] selectionArgs;
         String selection;
 
-        if (Integer.parseInt(startDate) == 0) {
+        if (startDate == 0) {
             selection = sLocationSettingSelection;
             selectionArgs = new String[]{locationSetting};
         } else {
-            selectionArgs = new String[]{locationSetting, startDate};
+            selectionArgs = new String[]{locationSetting, Long.toString(startDate)};
             selection = sLocationSettingWithStartDateSelection;
         }
 
@@ -111,12 +111,12 @@ public class MoviesProvider extends ContentProvider {
     private Cursor getWeatherByLocationSettingAndDate(
             Uri uri, String[] projection, String sortOrder) {
         String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
-        String date = MoviesContract.MoviesEntry.getMovieIDFromUri(uri);
+        long date = MoviesContract.MoviesEntry.getMovieIDFromUri(uri);
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 sLocationSettingAndDaySelection,
-                new String[]{locationSetting, date},
+                new String[]{locationSetting, Long.toString(date)},
                 null,
                 null,
                 sortOrder
@@ -154,7 +154,7 @@ public class MoviesProvider extends ContentProvider {
         // For each type of URI we want to add, create a corresponding code.
         matcher.addURI(authority, MoviesContract.PATH_MOVIES, MOVIES);
         matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*", MOVIES_WITH_SORT_ORDER);
-        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*/*", MOVIES_WITH_SORT_ORDER_AND_DATE);
+        matcher.addURI(authority, MoviesContract.PATH_MOVIES + "/*/#", MOVIES_WITH_SORT_ORDER_AND_DATE);
 
 
         // 3) Return the new matcher!

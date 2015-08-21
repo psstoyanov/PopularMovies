@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -92,22 +93,22 @@ public class DetailActivity extends AppCompatActivity
                 MoviesContract.MoviesEntry.COLUMN_MOVIE_ID,
                 MoviesContract.MoviesEntry.COLUMN_OVERVIEW,
                 MoviesContract.MoviesEntry.COLUMN_POSTER_PATH,
-                MoviesContract.SortEntry.COLUMN_SORT_SETTING,
+                //MoviesContract.SortEntry.COLUMN_SORT_SETTING,
                 MoviesContract.MoviesEntry.COLUMN_POPULARITY,
                 MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE,
                 MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE,
         };
         // These indices are tied to DISCOVER_MOVIES_COLUMNS.  If DISCOVER_MOVIES_COLUMNS changes, these
         // must change.
-        static final int COL_MOVIES_ID = 0;
+        //static final int COL_MOVIES_ID = 0;
         static final int COL_MOVIE_TITLE = 1;
-        static final int COL_MOVIE_ID = 2;
+        //static final int COL_MOVIE_ID = 2;
         static final int COL_OVERVIEW = 3;
         static final int COL_POSTER_PATH= 4;
-        static final int COL__SORT_SETTING = 5;
-        static final int COL_POPULARITY = 6;
-        static final int COL_VOTE_AVERAGE = 7;
-        static final int COL_RELEASE_DATE = 8;
+        //static final int COL__SORT_SETTING = 5;
+        static final int COL_POPULARITY = 5;
+        static final int COL_VOTE_AVERAGE = 6;
+        static final int COL_RELEASE_DATE = 7;
 
         public DetailFragment()
         {
@@ -187,11 +188,13 @@ public class DetailActivity extends AppCompatActivity
             if (intent == null) {
                 return null;
             }
+            Uri uri = intent.getData();
+            Log.d(LOG_TAG, String.valueOf(uri));
             // Now create and return a CursorLoader that will take care of
             // creating a Cursor for the data being displayed.
             return new CursorLoader(
                     getActivity(),
-                    intent.getData(),
+                    uri,
                     DISCOVER_MOVIES_COLUMNS,
                     null,
                     null,

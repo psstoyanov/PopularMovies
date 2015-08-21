@@ -56,9 +56,9 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
 
                 // the ID of the sort entry associated with this movie data
                 MoviesEntry.COLUMN_SORT_KEY + " INTEGER NOT NULL, " +
-                MoviesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
+                MoviesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL, " +
                 MoviesEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
-                MoviesEntry.COLUMN_MOVIE_ID + " INTEGER NOT NULL ," +
+                MoviesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL ," +
 
                 MoviesEntry.COLUMN_POPULARITY + " INTEGER NOT NULL, " +

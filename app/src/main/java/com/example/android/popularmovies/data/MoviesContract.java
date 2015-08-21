@@ -138,31 +138,31 @@ public class MoviesContract
         }
 
         public static Uri buildMoviesSortordernWithSpecificMovieID(
-                String sortSetting, String startDate) {
+                String sortSetting, long movieId) {
             //long normalizedDate = normalizeDate(startDate);
             return CONTENT_URI.buildUpon().appendPath(sortSetting)
-                    .appendQueryParameter(COLUMN_MOVIE_ID, startDate).build();
+                    .appendQueryParameter(COLUMN_MOVIE_ID, Long.toString(movieId)).build();
         }
 
-        public static Uri buildMovieSortOrderWithMovieID(String sortorderSetting, String movieID) {
+        public static Uri buildMovieSortOrderWithMovieID(String sortorderSetting, long movieID) {
             return CONTENT_URI.buildUpon().appendPath(sortorderSetting)
-                    .appendPath(movieID).build();
+                    .appendPath(Long.toString(movieID)).build();
         }
 
         public static String getSortSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
 
-        public static String getMovieIDFromUri(Uri uri) {
-            return uri.getPathSegments().get(2);
+        public static long getMovieIDFromUri(Uri uri) {
+            return Long.parseLong(uri.getPathSegments().get(2));
         }
 
-        public static String getTheMovieIDFromUri(Uri uri) {
+        public static long getTheMovieIDFromUri(Uri uri) {
             String dateString = uri.getQueryParameter(COLUMN_MOVIE_ID);
             if (null != dateString && dateString.length() > 0)
-                return dateString;
+                return Long.parseLong(dateString);
             else
-                return "0";
+                return 0;
         }
 
     }

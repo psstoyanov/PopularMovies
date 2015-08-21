@@ -164,7 +164,7 @@ public class TestProvider extends AndroidTestCase {
         assertEquals("Error: the MoviesEntry CONTENT_URI with sort order should return MoviesEntry.CONTENT_TYPE",
                 MoviesEntry.CONTENT_TYPE, type);
 
-        String testDate = "2015"; // December 21st, 2014
+        long testDate = 2015; // December 21st, 2014
         // content://com.example.android.popularmovies/movies/94074/20140612
         type = mContext.getContentResolver().getType(
                 MoviesEntry.buildMovieSortOrderWithMovieID(testLocation, testDate));
