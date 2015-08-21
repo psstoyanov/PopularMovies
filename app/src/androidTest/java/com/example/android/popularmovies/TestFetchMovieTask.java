@@ -39,7 +39,7 @@ public class TestFetchMovieTask extends AndroidTestCase{
                 MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ?",
                 new String[]{ADD_SORT_SETTING});
 
-        FetchMovieTask fwt = new FetchMovieTask(getContext(), null);
+        FetchMovieTask fwt = new FetchMovieTask(getContext());
         //long locationId = fwt.addLocation(ADD_SORT_SETTING, ADD_LOCATION_CITY,
         //        ADD_LOCATION_LAT, ADD_LOCATION_LON);
         long locationId = fwt.addsortOrder(ADD_SORT_SETTING);

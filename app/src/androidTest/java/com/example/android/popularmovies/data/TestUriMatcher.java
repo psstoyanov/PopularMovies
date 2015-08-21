@@ -32,7 +32,7 @@ public class TestUriMatcher extends AndroidTestCase {
    /* // content://com.example.android.sunshine.app/weather"
     private static final Uri TEST_WEATHER_DIR = WeatherContract.WeatherEntry.CONTENT_URI;
     private static final Uri TEST_WEATHER_WITH_LOCATION_DIR = WeatherContract.WeatherEntry.buildMoviesSortorder(LOCATION_QUERY);
-    private static final Uri TEST_WEATHER_WITH_LOCATION_AND_DATE_DIR = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(LOCATION_QUERY, TEST_DATE);
+    private static final Uri TEST_WEATHER_WITH_LOCATION_AND_DATE_DIR = WeatherContract.WeatherEntry.buildMovieSortOrderWithMovieID(LOCATION_QUERY, TEST_DATE);
     // content://com.example.android.sunshine.app/location"
     private static final Uri TEST_LOCATION_DIR = WeatherContract.LocationEntry.CONTENT_URI;
 */

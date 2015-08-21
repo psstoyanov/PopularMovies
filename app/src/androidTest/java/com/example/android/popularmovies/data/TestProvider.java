@@ -167,7 +167,7 @@ public class TestProvider extends AndroidTestCase {
         String testDate = "2015"; // December 21st, 2014
         // content://com.example.android.popularmovies/movies/94074/20140612
         type = mContext.getContentResolver().getType(
-                MoviesEntry.buildWeatherLocationWithDate(testLocation, testDate));
+                MoviesEntry.buildMovieSortOrderWithMovieID(testLocation, testDate));
         // vnd.android.cursor.item/com.example.android.popularmovies/movies/1419120000
         assertEquals("Error: the MoviesEntry CONTENT_URI with sort order and date should return MoviesEntry.CONTENT_ITEM_TYPE",
                 MoviesEntry.CONTENT_ITEM_TYPE, type);
@@ -398,7 +398,7 @@ public class TestProvider extends AndroidTestCase {
         // Get the joined Weather and Location data with a start date
         weatherCursor = mContext.getContentResolver().query(
                 //MoviesEntry.buildWeatherLocationWithStartDate(
-                MoviesEntry.buildMoviesSortordernWithStartDate(
+                MoviesEntry.buildMoviesSortordernWithSpecificMovieID(
                         TestUtilities.TEST_SORT_ORDER, TestUtilities.TEST_DATE),
                 null, // leaving "columns" null just returns all the columns.
                 null, // cols for "where" clause
@@ -410,7 +410,7 @@ public class TestProvider extends AndroidTestCase {
 
         // Get the joined Weather data for a specific date
         weatherCursor = mContext.getContentResolver().query(
-                MoviesEntry.buildWeatherLocationWithDate(TestUtilities.TEST_SORT_ORDER, TestUtilities.TEST_DATE),
+                MoviesEntry.buildMovieSortOrderWithMovieID(TestUtilities.TEST_SORT_ORDER, TestUtilities.TEST_DATE),
                 null,
                 null,
                 null,
@@ -460,7 +460,7 @@ public class TestProvider extends AndroidTestCase {
             ContentValues moviesValues = new ContentValues();
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortorderRowId);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, "2015");
-            moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, 1.1);
+            moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, 1.1 + i);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, "Despicable me" + i);
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, "Asteroids");
             moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POPULARITY, 1.2);

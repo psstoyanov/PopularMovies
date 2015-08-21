@@ -23,7 +23,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.util.Log;
 
 public class MoviesProvider extends ContentProvider {
 
@@ -84,7 +83,7 @@ public class MoviesProvider extends ContentProvider {
     // A function to get the movies by sort setting using the same query builder.
     private Cursor getWeatherByLocationSetting(Uri uri, String[] projection, String sortOrder) {
         String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
-        String startDate = MoviesContract.MoviesEntry.getStartDateFromUri(uri);
+        String startDate = MoviesContract.MoviesEntry.getTheMovieIDFromUri(uri);
 
         String[] selectionArgs;
         String selection;
@@ -112,7 +111,7 @@ public class MoviesProvider extends ContentProvider {
     private Cursor getWeatherByLocationSettingAndDate(
             Uri uri, String[] projection, String sortOrder) {
         String locationSetting = MoviesContract.MoviesEntry.getSortSettingFromUri(uri);
-        String date = MoviesContract.MoviesEntry.getDateFromUri(uri);
+        String date = MoviesContract.MoviesEntry.getMovieIDFromUri(uri);
 
         return sWeatherByLocationSettingQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,

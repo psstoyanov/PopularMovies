@@ -11,7 +11,7 @@ public class Utility {
 
     private static final String ratingMax = "10.0";
 
-    public static String getPreferredLocation(Context context) {
+    public static String getPreferredSortOrder(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(context.getString(R.string.pref_sort_key),
                 context.getString(R.string.pref_order_popularity));

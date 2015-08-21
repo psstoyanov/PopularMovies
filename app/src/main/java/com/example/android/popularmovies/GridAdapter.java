@@ -1,10 +1,8 @@
 package com.example.android.popularmovies;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,12 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -166,10 +162,16 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                 public void onClick(View v)
                 {
                     Context mContext = itemView.getContext();
-                    Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-                    Log.d(TAG, "Element " + getCursor().moveToPosition(getAdapterPosition()) + " clicked.");
-                    Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_TITLE) + " clicked.");
-
+                    //Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
+                   // Log.d(TAG, "Element " + getCursor().moveToPosition(getAdapterPosition()) + " clicked.");
+                    //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_TITLE) + " clicked.");
+                    String sortorderSetting = Utility.getPreferredSortOrder(mContext);
+                    Intent intent = new Intent(mContext, DetailActivity.class)
+                            .setData(MoviesContract.MoviesEntry.buildMoviesSortordernWithSpecificMovieID(
+                                    sortorderSetting, getCursor().getString(MovieGridFragment.COL_MOVIE_ID)
+                            ));
+                    mContext.startActivity(intent);
+                }
                   //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_ID)  + " clicked.");
                   //PopularMovieGridItem itemToSend = mItems.get(getAdapterPosition());
                   //int i = getAdapterPosition();
@@ -178,7 +180,7 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                   //        .putExtra(Intent.EXTRA_TEXT, itemToSend.getmName() + " " + itemToSend.getThumbnail());
                   //mContext.startActivity(intent);
                   //Toast.makeText(itemView.getContext(),"Recycler View" + getAdapterPosition() + " clicked",Toast.LENGTH_SHORT).show();
-                }
+
             });
         }
 

@@ -4,9 +4,7 @@ import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -118,7 +116,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         //String sortorder = prefs.getString(getString(R.string.pref_sort_key),
         //        getString(R.string.pref_order_popularity));
-        String sortOrder = Utility.getPreferredLocation(getActivity());
+        String sortOrder = Utility.getPreferredSortOrder(getActivity());
         movieTask.execute(sortOrder);
     }
 
@@ -136,7 +134,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        String sortSetting = Utility.getPreferredLocation(getActivity());
+        String sortSetting = Utility.getPreferredSortOrder(getActivity());
 
         Uri discoverMoviesWithSortOrder = MoviesContract.MoviesEntry.buildMoviesSortorder(sortSetting);
 

@@ -105,12 +105,12 @@ public class MoviesContract
 
         // Column with the foreign key into the sortorder table.
         public static final String COLUMN_SORT_KEY = "sortorder_id";
-        // // The movie release date
-        public static final String COLUMN_RELEASE_DATE = "date";
 
         // Movies id as returned by API
         public static final String COLUMN_MOVIE_ID = "movies_id";
 
+        // // The movie release date
+        public static final String COLUMN_RELEASE_DATE = "date";
         // Movies title as returned by API
         public static final String COLUMN_MOVIE_TITLE = "movies_title";
 
@@ -137,28 +137,28 @@ public class MoviesContract
             return CONTENT_URI.buildUpon().appendPath(sortSetting).build();
         }
 
-        public static Uri buildMoviesSortordernWithStartDate(
+        public static Uri buildMoviesSortordernWithSpecificMovieID(
                 String sortSetting, String startDate) {
             //long normalizedDate = normalizeDate(startDate);
             return CONTENT_URI.buildUpon().appendPath(sortSetting)
-                    .appendQueryParameter(COLUMN_RELEASE_DATE, startDate).build();
+                    .appendQueryParameter(COLUMN_MOVIE_ID, startDate).build();
         }
 
-        public static Uri buildWeatherLocationWithDate(String locationSetting, String date) {
-            return CONTENT_URI.buildUpon().appendPath(locationSetting)
-                    .appendPath(date).build();
+        public static Uri buildMovieSortOrderWithMovieID(String sortorderSetting, String movieID) {
+            return CONTENT_URI.buildUpon().appendPath(sortorderSetting)
+                    .appendPath(movieID).build();
         }
 
         public static String getSortSettingFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }
 
-        public static String getDateFromUri(Uri uri) {
+        public static String getMovieIDFromUri(Uri uri) {
             return uri.getPathSegments().get(2);
         }
 
-        public static String getStartDateFromUri(Uri uri) {
-            String dateString = uri.getQueryParameter(COLUMN_RELEASE_DATE);
+        public static String getTheMovieIDFromUri(Uri uri) {
+            String dateString = uri.getQueryParameter(COLUMN_MOVIE_ID);
             if (null != dateString && dateString.length() > 0)
                 return dateString;
             else
