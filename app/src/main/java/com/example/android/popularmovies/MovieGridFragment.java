@@ -51,7 +51,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_MOVIE_TITLE = 1;
     static final int COL_MOVIE_ID = 2;
     static final int COL_OVERVIEW = 3;
-    static final int COL_POSTER_PATH= 4;
+    static final int COL_POSTER_PATH = 4;
     static final int COL__SORT_SETTING = 5;
     static final int COL_POPULARITY = 6;
     static final int COL_VOTE_AVERAGE = 7;
@@ -125,6 +125,13 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(DISCOVER_MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
+
+    // since we read the location when we create the loader, all we need to do is restart things
+    void onSortOrderChanged() {
+        updateMovieData();
+        getLoaderManager().restartLoader(DISCOVER_MOVIES_LOADER, null, this);
+    }
+
 
     @Override
     public void onStart() {
