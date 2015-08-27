@@ -220,6 +220,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
 
                 String baseImgURL = "http://image.tmdb.org/t/p/";
+                // TODO: optimize the target image size
+                // TODO: Lesson 5- Video 19 "Adding images to the app"
                 String sizeImg = "w185//";
                 String movie_thumbnail_base;
                 String movie_thumbnail;

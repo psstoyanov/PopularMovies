@@ -88,16 +88,28 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.setHasFixedSize(true);
 
 
+
         // The number of Columns
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
-
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        if (savedInstanceState != null) {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+
+            Log.d(LOG_TAG, " onCreateView restore instance");
+        } else
+        {
+            updateMovieData();
+            Log.d(LOG_TAG, " onCreateView restore instance null");
+        }
+
 
         mAdapter = new GridAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
 
 
-        //Log.d(LOG_TAG, " onCreateView");
+        Log.d(LOG_TAG, " onCreateView");
         return view;
     }
 
@@ -127,7 +139,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         //String sortorder = prefs.getString(getString(R.string.pref_sort_key),
         //        getString(R.string.pref_order_popularity));
-        //Log.d(LOG_TAG, " updateMovieData");
+        Log.d(LOG_TAG, " updateMovieData");
         String sortOrder = Utility.getPreferredSortOrder(getActivity());
         movieTask.execute(sortOrder);
     }
@@ -151,21 +163,16 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
      * This is a method for Fragment.
      * You can do the same in onCreate or onRestoreInstanceState
      */
-    @Override
+    /*@Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
 
-        if(savedInstanceState != null)
-        {
+        if (savedInstanceState != null) {
             Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+            Log.d(LOG_TAG, "onViewStateRestored");
         }
-        else
-        {
-
-            updateMovieData();
-        }
-    }
+    }*/
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -176,7 +183,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onStart() {
         super.onStart();
-
         Log.d(LOG_TAG, " onStart");
     }
 

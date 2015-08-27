@@ -34,53 +34,6 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
     {
         super(context, cursor);
         mCursor = cursor;
-        //mItems = new ArrayList<>();
-
-        //Initializing the adapter with an empty object.
-        //PopularMovieGridItem movies = new PopularMovieGridItem();
-        //mItems.add(0, movies);
-        //notifyItemInserted(0);
-
-
-        /*for (int i = 0; i < 15; i++)
-        {
-            PopularMovieGridItem movies = new PopularMovieGridItem();
-            movies.setmName("Test " + Integer.toString(i));
-            movies.setmThumbnail("http://img13.deviantart.net/e8e8/i/2012/045/2/0/passage_wallpaper_by_trenchmaker-d4pp3zd.jpg");
-            mItems.add(i, movies);
-            notifyItemInserted(i);
-        }*/
-
-    }
-
-
-
-
-
-    public void add(PopularMovieGridItem item, int position)
-    {
-        mItems.add(position, item);
-        notifyItemInserted(position);
-    }
-
-    public void add(PopularMovieGridItem item)
-    {
-        int pos = mItems.size();
-        mItems.add(item);
-        notifyItemInserted(pos);
-    }
-
-    public void remove(PopularMovieGridItem item)
-    {
-        int position = mItems.indexOf(item);
-        mItems.remove(position);
-        notifyItemRemoved(position);
-    }
-    public void clearAll()
-    {
-        int size = mItems.size();
-        mItems.clear();
-        notifyItemRangeRemoved(0, size);
     }
 
 
@@ -94,26 +47,6 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
         Log.d(TAG,"Cursor pos: "+ getCursor().getPosition());
         return viewHolder;
     }
-
-    /*@Override
-    public void onBindViewHolder(ViewHolder viewHolder, int i)
-    {
-        PopularMovieGridItem movielist = mItems.get(i);
-        viewHolder.tvtitles.setText(movielist.getmName());
-
-        //viewHolder.imgThumbnail.setImageResource(movielist.getThumbnail());
-
-        //Use psso to load an image.
-        Picasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
-
-        //Add a fit and center function from Picasso
-        //Also changed how the view itself will handle it.
-        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.blank_thumbnail)
-                .fit().centerInside().into(viewHolder.imgThumbnail);
-
-        //Picasso.with(viewHolder.imgThumbnail.getContext()).load(R.drawable.grid_item_mock).into(viewHolder.imgThumbnail);
-
-    }*/
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor)
@@ -130,16 +63,11 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
         Picasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
         //Add a fit and center function from Picasso
         //Also changed how the view itself will handle it.
-        Picasso.with(viewHolder.imgThumbnail.getContext()).load(movielist.getThumbnail()).placeholder(R.drawable.blank_thumbnail)
-                .fit().centerInside().into(viewHolder.imgThumbnail);
+        Picasso.with(viewHolder.imgThumbnail.getContext())
+                .load(movielist.getThumbnail())
+                .placeholder(R.drawable.blank_thumbnail).
+                fit().centerInside().into(viewHolder.imgThumbnail);
     }
-
-    /*@Override
-    public int getItemCount()
-    {
-
-        return mItems.size();
-    }*/
 
 
     class ViewHolder extends RecyclerView.ViewHolder
@@ -162,9 +90,6 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                 public void onClick(View v)
                 {
                     Context mContext = itemView.getContext();
-                    //Log.d(TAG, "Element " + getAdapterPosition() + " clicked.");
-                   // Log.d(TAG, "Element " + getCursor().moveToPosition(getAdapterPosition()) + " clicked.");
-                    //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_TITLE) + " clicked.");
                     String sortorderSetting = Utility.getPreferredSortOrder(mContext);
                     getCursor().moveToFirst();
                     getCursor().moveToPosition(getAdapterPosition());
