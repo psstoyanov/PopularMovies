@@ -93,11 +93,10 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                     String sortorderSetting = Utility.getPreferredSortOrder(mContext);
                     getCursor().moveToFirst();
                     getCursor().moveToPosition(getAdapterPosition());
-                    Intent intent = new Intent(mContext, DetailActivity.class)
-                            .setData(MoviesContract.MoviesEntry.buildMovieSortOrderWithMovieID(
+                    ((MovieGridFragment.Callback) mContext).onItemSelected(MoviesContract.MoviesEntry.buildMovieSortOrderWithMovieID(
                                     sortorderSetting, getCursor().getLong(MovieGridFragment.COL_MOVIE_ID)
                             ));
-                    mContext.startActivity(intent);
+                    //mContext.startActivity(intent);
                 }
                   //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_ID)  + " clicked.");
                   //PopularMovieGridItem itemToSend = mItems.get(getAdapterPosition());

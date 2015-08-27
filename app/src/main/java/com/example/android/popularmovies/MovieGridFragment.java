@@ -67,6 +67,19 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     RecyclerView.LayoutManager mLayoutManager;
     GridAdapter mAdapter;
 
+    /**
+     * +     * A callback interface that all activities containing this fragment must
+     * +     * implement. This mechanism allows activities to be notified of item
+     * +     * selections.
+     * +
+     */
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri dateUri);
+    }
+
 
     public MovieGridFragment() {
     }
@@ -88,7 +101,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.setHasFixedSize(true);
 
 
-
         // The number of Columns
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -98,8 +110,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
 
             Log.d(LOG_TAG, " onCreateView restore instance");
-        } else
-        {
+        } else {
             updateMovieData();
             Log.d(LOG_TAG, " onCreateView restore instance null");
         }
@@ -173,11 +184,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             Log.d(LOG_TAG, "onViewStateRestored");
         }
     }*/
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().onSaveInstanceState());
+        super.onSaveInstanceState(outState);
     }
 
     @Override

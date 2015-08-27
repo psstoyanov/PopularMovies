@@ -30,17 +30,20 @@ import com.squareup.picasso.Picasso;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>
-{
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     /* Add the log tag
     * */
     private static final String LOG_TAG = DetailFragment.class.getName();
 
     private static final String MOVIE_SHARE_HASHTAG = "#PopularMovies ";
 
+    static final String DETAIL_URI = "URI";
+
     private ShareActionProvider mShareActioProvider;
 
     private String mMovieStr;
+
+    private Uri mUri;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -67,22 +70,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_MOVIE_TITLE = 1;
     //static final int COL_MOVIE_ID = 2;
     static final int COL_OVERVIEW = 3;
-    static final int COL_POSTER_PATH= 4;
+    static final int COL_POSTER_PATH = 4;
     //static final int COL__SORT_SETTING = 5;
     static final int COL_POPULARITY = 5;
     static final int COL_VOTE_AVERAGE = 6;
     static final int COL_RELEASE_DATE = 7;
 
-    public DetailFragment()
-    {
+    public DetailFragment() {
         setHasOptionsMenu(true);
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState)
-    {
+                             Bundle savedInstanceState) {
             /*View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
             // The detail Activity called via intent. Inspect the intent for additional data.
             Intent intent = getActivity().getIntent();
@@ -95,15 +96,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             {
                 ((TextView) rootView.findViewById(R.id.detail_text)).setText(mMovieStr);
             }*/
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+        }
+
         return inflater.inflate(R.layout.fragment_detail, container, false);
     }
 
 
-
     /* Add the options menu to the fragment. */
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
-    {
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         // Inflate the menu; this adds items to the action bar if it is present.
         inflater.inflate(R.menu.detailfragment, menu);
 
@@ -116,16 +120,15 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         // Attach the intent to this ShareActionProvider. You can update this at any time,
         // like when the user selects new piece of data they might like to share.
-        if(mMovieStr != null)
-        {
+        if (mMovieStr != null) {
             mShareActioProvider.setShareIntent(createShareMovieIntent());
         }
 
 
     }
+
     /* The share intent. */
-    private Intent createShareMovieIntent()
-    {
+    private Intent createShareMovieIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
 
         //The FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET is depricated as of API 21
@@ -144,31 +147,47 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onActivityCreated(savedInstanceState);
     }
 
+    void onSortOrderChanged(String newSortOrder) {
+        // replace the uri, since the location has changed
+        Uri uri = mUri;
+        if (null != uri) {
+            long movieID = MoviesContract.MoviesEntry.getMovieIDFromUri(uri);
+            Uri updatedUri = MoviesContract.MoviesEntry.buildMovieSortOrderWithMovieID(newSortOrder, movieID);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+        }
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        if (intent == null) {
-            return null;
+        //Log.v(LOG_TAG, "In onCreateLoader");
+        //Intent intent = getActivity().getIntent();
+        //if (intent == null || intent.getData() == null) {
+        //    return null;
+        //}
+        //Uri uri = intent.getData();
+        //Log.d(LOG_TAG, String.valueOf(uri));
+        if (null != mUri) {
+            // Now create and return a CursorLoader that will take care of
+            // creating a Cursor for the data being displayed.
+            return new CursorLoader(
+                    getActivity(),
+                    mUri,
+                    DISCOVER_MOVIES_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
         }
-        Uri uri = intent.getData();
-        Log.d(LOG_TAG, String.valueOf(uri));
-        // Now create and return a CursorLoader that will take care of
-        // creating a Cursor for the data being displayed.
-        return new CursorLoader(
-                getActivity(),
-                uri,
-                DISCOVER_MOVIES_COLUMNS,
-                null,
-                null,
-                null
-        );
+        return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
-        if (!data.moveToFirst()) { return; }
+        if (!data.moveToFirst()) {
+            return;
+        }
 
         String movieTitleString = data.getString(COL_MOVIE_TITLE);
 
@@ -191,17 +210,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Log.d(LOG_TAG, data.getString(COL_OVERVIEW));
 
 
-        TextView detailMovieTitleTextView = (TextView)getView().findViewById(R.id.detail_movie_title);
+        TextView detailMovieTitleTextView = (TextView) getView().findViewById(R.id.detail_movie_title);
         detailMovieTitleTextView.setText(movieTitleString);
 
-        TextView detailMovieReleaseDateView = (TextView)getView().findViewById(R.id.detail_movie_releasedate);
+        TextView detailMovieReleaseDateView = (TextView) getView().findViewById(R.id.detail_movie_releasedate);
         detailMovieReleaseDateView.setText(movieReleaseDate);
-        TextView detailMovieRatingView = (TextView)getView().findViewById(R.id.detail_movie_rating);
+        TextView detailMovieRatingView = (TextView) getView().findViewById(R.id.detail_movie_rating);
         detailMovieRatingView.setText(movieRating);
-        TextView detailMovieOverView = (TextView)getView().findViewById(R.id.detail_movie_overview);
+        TextView detailMovieOverView = (TextView) getView().findViewById(R.id.detail_movie_overview);
         detailMovieOverView.setText(movieOverView);
 
-        ImageView movieThumbnailView = (ImageView)getView().findViewById(R.id.detail_movie_thumbnail);
+        ImageView movieThumbnailView = (ImageView) getView().findViewById(R.id.detail_movie_thumbnail);
         Picasso.with(getActivity()).load(movieThumbnail).placeholder(R.drawable.blank_thumbnail)
                 .fit().centerInside().into(movieThumbnailView);
 
