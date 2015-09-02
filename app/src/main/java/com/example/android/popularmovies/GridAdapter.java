@@ -114,8 +114,7 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                 public void onClick(View v)
                 {
 
-                    // TODO: add a selected notifier and pass it.
-                    // Store the position in a Bundle and pass it.
+
                     Context mContext = itemView.getContext();
                     String sortorderSetting = Utility.getPreferredSortOrder(mContext);
                     getCursor().moveToFirst();
