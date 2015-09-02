@@ -41,6 +41,10 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
     {
         return mSelectedItem;
     }
+    public void setmSelectedItem(int position)
+    {
+        mSelectedItem = position;
+    }
 
     public void resetmSelectedItem()
     {

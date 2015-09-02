@@ -9,13 +9,13 @@
 
         <!-- The highlighted item background works if it is inside the main theme-->
         <!-- There are two drawables- one for phones (transparent) and one for tablets-->
-        <item name="android:activatedBackgroundIndicator">@drawable/touch_selector</item>
+
     </style>
 
     <style name="MovieGridRecyclerStyle" parent="AppTheme">
         <!-- Here it's a stub.  In screens of sufficient width,-->
         <!--this style includes modifications for two-pane layout -->
-
+        <item name="android:activatedBackgroundIndicator">@drawable/touch_selector</item>
     </style>
 
 </resources>

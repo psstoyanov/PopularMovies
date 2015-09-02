@@ -31,6 +31,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     private final String LOG_TAG = MovieGridFragment.class.getSimpleName();
 
     private static final String BUNDLE_RECYCLER_LAYOUT = "layoutManager";
+    private static final String SELECTED_KEY = "selected_position";
 
     // Specify the columns we need.
     private static final String[] DISCOVER_MOVIES_COLUMNS = {
@@ -104,21 +105,31 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         // The number of Columns
         mLayoutManager = new GridLayoutManager(getActivity(), 2);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mAdapter = new GridAdapter(getActivity(), null);
 
+        // If there's instance state, mine it for useful information.
+        // The end-goal here is that the user never knows that turning their device sideways
+        // does crazy lifecycle related things.  It should feel like some stuff stretched out,
+        // or magically appeared to take advantage of room, but data or place in the app was never
+        // actually *lost*.
         if (savedInstanceState != null) {
             Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-
+            if (savedInstanceState.containsKey(SELECTED_KEY))
+            {
+                mAdapter.setmSelectedItem(savedInstanceState.getInt(SELECTED_KEY));
+                //mRecyclerView.smoothScrollToPosition(savedInstanceState.getInt(SELECTED_KEY));
+            }
             Log.d(LOG_TAG, " onCreateView restore instance");
         } else {
             updateMovieData();
             Log.d(LOG_TAG, " onCreateView restore instance null");
         }
 
-        Log.d(LOG_TAG, String.valueOf(mRecyclerView.getResources()));
+        //Log.d(LOG_TAG, String.valueOf(mRecyclerView.getResources()));
 
 
-        mAdapter = new GridAdapter(getActivity(), null);
+
         mRecyclerView.setAdapter(mAdapter);
 
 
@@ -167,8 +178,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
     // since we read the location when we create the loader, all we need to do is restart things
-    void onSortOrderChanged()
-    {
+    void onSortOrderChanged() {
         updateMovieData();
         mAdapter.resetmSelectedItem();
         getLoaderManager().restartLoader(DISCOVER_MOVIES_LOADER, null, this);
@@ -190,8 +200,23 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     }*/
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().onSaveInstanceState());
-        super.onSaveInstanceState(outState);
+        // When tablets rotate, the currently selected list item needs to be saved.
+        // When no item is selected, mPosition will be set to INVALID_POSITION,
+        // so check for that before storing.
+        if (mAdapter.getmSelectedItem() != -1) {
+            outState.putInt(SELECTED_KEY, mAdapter.getmSelectedItem());
+        }
+
+
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().
+
+                        onSaveInstanceState()
+
+        );
+        super.
+
+                onSaveInstanceState(outState);
+
     }
 
     @Override
@@ -202,6 +227,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+
+        // This is called when a new Loader needs to be created.  This
+        // fragment only uses one loader, so we don't care about checking the id.
+
         String sortSetting = Utility.getPreferredSortOrder(getActivity());
 
         Uri discoverMoviesWithSortOrder = MoviesContract.MoviesEntry.buildMoviesSortorder(sortSetting);
@@ -218,6 +247,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         //mForecastAdapter.swapCursor(cursor);
         mAdapter.swapCursor(cursor);
+
+        if (mAdapter.getmSelectedItem() != -1) {
+            // If we don't need to restart the loader, and there's a desired position to restore
+            // to, do so now.
+            mRecyclerView.smoothScrollToPosition(mAdapter.getmSelectedItem());
+        }
     }
 
     @Override
