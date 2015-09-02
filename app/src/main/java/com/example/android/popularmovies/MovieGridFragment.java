@@ -115,6 +115,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             Log.d(LOG_TAG, " onCreateView restore instance null");
         }
 
+        Log.d(LOG_TAG, String.valueOf(mRecyclerView.getResources()));
+
 
         mAdapter = new GridAdapter(getActivity(), null);
         mRecyclerView.setAdapter(mAdapter);
@@ -165,8 +167,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
     // since we read the location when we create the loader, all we need to do is restart things
-    void onSortOrderChanged() {
+    void onSortOrderChanged()
+    {
         updateMovieData();
+        mAdapter.resetmSelectedItem();
         getLoaderManager().restartLoader(DISCOVER_MOVIES_LOADER, null, this);
     }
 

@@ -27,6 +27,7 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
     private int itemLayout;
     private static final String TAG = "CustomAdapter";
     Context mContext;
+    private int mSelectedItem = -1;
     Cursor mCursor;
 
 
@@ -34,6 +35,16 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
     {
         super(context, cursor);
         mCursor = cursor;
+    }
+
+    public int getmSelectedItem()
+    {
+        return mSelectedItem;
+    }
+
+    public void resetmSelectedItem()
+    {
+        mSelectedItem = -1;
     }
 
 
@@ -67,6 +78,14 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                 .load(movielist.getThumbnail())
                 .placeholder(R.drawable.blank_thumbnail).
                 fit().centerInside().into(viewHolder.imgThumbnail);
+        if(cursor.getPosition() == mSelectedItem)
+        {
+            viewHolder.itemView.findViewById(R.id.top_layout).setActivated(true);
+        }
+        else
+        {
+            viewHolder.itemView.findViewById(R.id.top_layout).setActivated(false);
+        }
     }
 
 
@@ -80,6 +99,7 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
         {
 
             super(itemView);
+            itemView.setClickable(true);
 
             imgThumbnail = (ImageView) itemView.findViewById(R.id.img_thumbnail);
             tvtitles = (TextView) itemView.findViewById(R.id.tv_movie_title);
@@ -89,13 +109,18 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder>
                 @Override
                 public void onClick(View v)
                 {
+
+                    // TODO: add a selected notifier and pass it.
+                    // Store the position in a Bundle and pass it.
                     Context mContext = itemView.getContext();
                     String sortorderSetting = Utility.getPreferredSortOrder(mContext);
                     getCursor().moveToFirst();
                     getCursor().moveToPosition(getAdapterPosition());
                     ((MovieGridFragment.Callback) mContext).onItemSelected(MoviesContract.MoviesEntry.buildMovieSortOrderWithMovieID(
-                                    sortorderSetting, getCursor().getLong(MovieGridFragment.COL_MOVIE_ID)
-                            ));
+                            sortorderSetting, getCursor().getLong(MovieGridFragment.COL_MOVIE_ID)
+                    ));
+                    mSelectedItem = getAdapterPosition();
+                    notifyDataSetChanged();
                     //mContext.startActivity(intent);
                 }
                   //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_ID)  + " clicked.");
