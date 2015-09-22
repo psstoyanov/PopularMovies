@@ -2,7 +2,6 @@ package com.example.android.popularmovies;
 
 import android.net.Uri;
 import android.os.Parcelable;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.content.CursorLoader;
@@ -65,6 +64,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     static final int COL_RELEASE_DATE = 8;
 
     RecyclerView mRecyclerView;
+    private Runnable viewBeginTwoPane;
+    private boolean mUseTwoPaneBeginLayout;
     RecyclerView.LayoutManager mLayoutManager;
     GridAdapter mAdapter;
 
@@ -115,8 +116,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         if (savedInstanceState != null) {
             Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-            if (savedInstanceState.containsKey(SELECTED_KEY))
-            {
+            if (savedInstanceState.containsKey(SELECTED_KEY)) {
                 mAdapter.setmSelectedItem(savedInstanceState.getInt(SELECTED_KEY));
                 //mRecyclerView.smoothScrollToPosition(savedInstanceState.getInt(SELECTED_KEY));
             }
@@ -129,9 +129,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         //Log.d(LOG_TAG, String.valueOf(mRecyclerView.getResources()));
 
 
-
         mRecyclerView.setAdapter(mAdapter);
-
 
         Log.d(LOG_TAG, " onCreateView");
         return view;
@@ -206,17 +204,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         if (mAdapter.getmSelectedItem() != -1) {
             outState.putInt(SELECTED_KEY, mAdapter.getmSelectedItem());
         }
-
-
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().
-
                         onSaveInstanceState()
-
         );
-        super.
-
-                onSaveInstanceState(outState);
-
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -244,7 +235,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+    public void onLoadFinished(Loader<Cursor> cursorLoader, final Cursor cursor) {
         //mForecastAdapter.swapCursor(cursor);
         mAdapter.swapCursor(cursor);
 
@@ -253,11 +244,31 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             // to, do so now.
             mRecyclerView.smoothScrollToPosition(mAdapter.getmSelectedItem());
         }
+        //In case we have two pane layout, we want to load the first item.
+        else if (cursor != null && mUseTwoPaneBeginLayout)
+        {
+            mAdapter.notifyDataSetChanged();
+            // Create a new runnable to perform the click event.
+            viewBeginTwoPane = new Runnable(){
+                @Override
+                public void run() {
+                    mAdapter.setClickSelect(getActivity(),cursor,0);
+                }
+            };
+            // Launch a new thread to perform the action.
+            Thread thread =  new Thread(null, viewBeginTwoPane, "MagentoBackground");
+            thread.start();
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mAdapter.swapCursor(null);
     }
+    public void setUseTwoPaneBeginLayout(boolean useTwoPaneBeginView) {
+            mUseTwoPaneBeginLayout = useTwoPaneBeginView;
+        }
+
+
 
 }

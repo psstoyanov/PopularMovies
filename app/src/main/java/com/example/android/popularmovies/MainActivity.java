@@ -38,7 +38,14 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             }
         } else {
             mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
         }
+
+        MovieGridFragment movieGridFragment = ((MovieGridFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_moviegrid));
+        // In case we have two pane layout, we want to view the first item
+        // in the DetailFragment when the data is finished loading.
+        movieGridFragment.setUseTwoPaneBeginLayout(mTwoPane);
 
         /*if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction().
@@ -54,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+    public boolean getTwoPane()
+    { return mTwoPane; }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
