@@ -115,6 +115,7 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder> {
                     Log.d(TAG, String.valueOf(getAdapterPosition()));
                     notifyDataSetChanged();*/
                     setClickSelect(mContext, getCursor(), getAdapterPosition());
+                    notifyDataSetChanged();
                     //mContext.startActivity(intent);
                 }
                 //Log.d(TAG, "Element " + getCursor().getString(MovieGridFragment.COL_MOVIE_ID)  + " clicked.");
@@ -146,7 +147,6 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder> {
                 sortorderSetting, getCursor().getLong(MovieGridFragment.COL_MOVIE_ID)
         ));
         mSelectedItem = pos;
-        notifyDataSetChanged();
     }
 
 

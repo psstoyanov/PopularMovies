@@ -1,5 +1,6 @@
 package com.example.android.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.popularmovies.data.MoviesContract;
+import com.example.android.popularmovies.services.PopularMoviesService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -157,13 +159,19 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
     private void updateMovieData() {
-        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+        //FetchMovieTask movieTask = new FetchMovieTask(getActivity());
         //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         //String sortorder = prefs.getString(getString(R.string.pref_sort_key),
         //        getString(R.string.pref_order_popularity));
-        Log.d(LOG_TAG, " updateMovieData");
-        String sortOrder = Utility.getPreferredSortOrder(getActivity());
-        movieTask.execute(sortOrder);
+        //Log.d(LOG_TAG, " updateMovieData");
+        //String sortOrder = Utility.getPreferredSortOrder(getActivity());
+        //movieTask.execute(sortOrder);
+
+        Intent intent = new Intent(getActivity(), PopularMoviesService.class);
+        intent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
+                Utility.getPreferredSortOrder(getActivity()));
+        getActivity().startService(intent);
+
     }
 
     @Override
@@ -213,6 +221,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onStart() {
         super.onStart();
+        // Quick fix: app was crashing in two pane mode
+        // when returning from the SettingsActivity with the system back button
+        // instead of the back button in the app bar.
+        getLoaderManager().initLoader(0, null, this);
         Log.d(LOG_TAG, " onStart");
     }
 
@@ -245,18 +257,19 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.smoothScrollToPosition(mAdapter.getmSelectedItem());
         }
         //In case we have two pane layout, we want to load the first item.
-        else if (cursor != null && mUseTwoPaneBeginLayout)
-        {
+        else if (cursor != null && mUseTwoPaneBeginLayout) {
+
             mAdapter.notifyDataSetChanged();
             // Create a new runnable to perform the click event.
-            viewBeginTwoPane = new Runnable(){
+            // Caution! When using the system back
+            viewBeginTwoPane = new Runnable() {
                 @Override
                 public void run() {
-                    mAdapter.setClickSelect(getActivity(),cursor,0);
+                    mAdapter.setClickSelect(getActivity(), cursor, 0);
                 }
             };
             // Launch a new thread to perform the action.
-            Thread thread =  new Thread(null, viewBeginTwoPane, "MagentoBackground");
+            Thread thread = new Thread(null, viewBeginTwoPane, "MagentoBackground");
             thread.start();
         }
     }
@@ -265,10 +278,10 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mAdapter.swapCursor(null);
     }
-    public void setUseTwoPaneBeginLayout(boolean useTwoPaneBeginView) {
-            mUseTwoPaneBeginLayout = useTwoPaneBeginView;
-        }
 
+    public void setUseTwoPaneBeginLayout(boolean useTwoPaneBeginView) {
+        mUseTwoPaneBeginLayout = useTwoPaneBeginView;
+    }
 
 
 }

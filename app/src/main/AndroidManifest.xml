@@ -30,7 +30,8 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="com.example.android.popularmovies.MainActivity" >
+            android:parentActivityName="com.example.android.popularmovies.MainActivity"
+            android:theme="@style/SettingsTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.popularmovies.MainActivity" />
@@ -40,6 +41,7 @@
             android:name=".data.MoviesProvider"
             android:enabled="true"
             android:exported="true"/>
+        <service android:name=".services.PopularMoviesService"/>
     </application>
 
 </manifest>

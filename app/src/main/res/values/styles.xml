@@ -6,16 +6,25 @@
         <!-- Adding Material theme color palette. -->
         <item name="colorPrimary">@color/ColorPrimary</item>
         <item name="colorPrimaryDark">@color/ColorPrimaryDark</item>
-
         <!-- The highlighted item background works if it is inside the main theme-->
         <!-- There are two drawables- one for phones (transparent) and one for tablets-->
 
     </style>
+
+    <!-- Settings activity theme. -->
+    <style name="SettingsTheme" parent="AppTheme"></style>
 
     <style name="MovieGridRecyclerStyle" parent="AppTheme">
         <!-- Here it's a stub.  In screens of sufficient width,-->
         <!--this style includes modifications for two-pane layout -->
         <item name="android:activatedBackgroundIndicator">@drawable/touch_selector</item>
     </style>
+
+    <!-- main activity action bar styles -->
+    <style name="ActionBar.Solid.PopularMovies.NoTitle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="displayOptions">useLogo|showHome</item>
+        <item name="logo">@mipmap/ic_launcher</item>
+    </style>
+
 
 </resources>
