@@ -42,6 +42,8 @@
             android:enabled="true"
             android:exported="true"/>
         <service android:name=".services.PopularMoviesService"/>
+        <receiver android:name=".services.PopularMoviesService$AlarmReceiver"
+            android:enabled="true"/>
     </application>
 
 </manifest>

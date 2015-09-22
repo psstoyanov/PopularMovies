@@ -1,5 +1,8 @@
 package com.example.android.popularmovies;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Parcelable;
@@ -167,10 +170,18 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         //String sortOrder = Utility.getPreferredSortOrder(getActivity());
         //movieTask.execute(sortOrder);
 
-        Intent intent = new Intent(getActivity(), PopularMoviesService.class);
-        intent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
+        Intent alarmIntent = new Intent(getActivity(),PopularMoviesService.AlarmReceiver.class);
+        alarmIntent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
                 Utility.getPreferredSortOrder(getActivity()));
-        getActivity().startService(intent);
+
+        //Wrap in a pending intent which only fires once.
+        PendingIntent pi = PendingIntent.getBroadcast(getActivity(),0,
+                alarmIntent,PendingIntent.FLAG_ONE_SHOT);
+        //getBroadcast(context, 0, i, 0);
+
+        AlarmManager am=(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+        //Set the AlarmManager to wake up the system.
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
 
     }
 

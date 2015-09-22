@@ -1,8 +1,10 @@
 package com.example.android.popularmovies.services;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -35,7 +37,6 @@ public class PopularMoviesService extends IntentService {
 
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
      */
     public PopularMoviesService() {
         super("PopularMovies");
@@ -103,7 +104,7 @@ public class PopularMoviesService extends IntentService {
             }
             moviedbJsonStr = buffer.toString();
             getMoviesDataFromJson(moviedbJsonStr, sortQuery);
-            Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
+            //Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
 
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error ", e);
@@ -236,14 +237,14 @@ public class PopularMoviesService extends IntentService {
 
             // add to database
             if (cVVector.size() > 0) {
-                Log.d(LOG_TAG, String.valueOf(cVVector.size()));
+                //Log.d(LOG_TAG, String.valueOf(cVVector.size()));
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
                 inserted = this.getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
             }
 
-            Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
+            //Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -298,6 +299,17 @@ public class PopularMoviesService extends IntentService {
         return sortRowId;
         // If it exists, return the current ID
         // Otherwise, insert it using the content resolver and the base URI
+    }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent sendIntent = new Intent(context, PopularMoviesService.class);
+            sendIntent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
+                    intent.getStringExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA));
+            context.startService(sendIntent);
+        }
     }
 
 }
