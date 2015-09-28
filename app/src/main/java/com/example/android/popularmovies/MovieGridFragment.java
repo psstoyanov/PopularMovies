@@ -268,20 +268,31 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.smoothScrollToPosition(mAdapter.getmSelectedItem());
         }
         //In case we have two pane layout, we want to load the first item.
-        else if (cursor != null && mUseTwoPaneBeginLayout) {
+        else if (cursor != null && mUseTwoPaneBeginLayout)
+        {
 
-            mAdapter.notifyDataSetChanged();
-            // Create a new runnable to perform the click event.
-            // Caution! When using the system back
-            viewBeginTwoPane = new Runnable() {
-                @Override
-                public void run() {
-                    mAdapter.setClickSelect(getActivity(), cursor, 0);
-                }
-            };
-            // Launch a new thread to perform the action.
-            Thread thread = new Thread(null, viewBeginTwoPane, "MagentoBackground");
-            thread.start();
+            // Check if the adapter is empty
+            // and if the adapter has all items from the cursor
+            // initialized before selecting the first item.
+            // Otherwise, the app will crash when first loaded
+            // as the tables are empty.
+            if (mAdapter.getItemCount() == cursor.getCount() &&
+                    mAdapter.getItemCount()!= 0)
+            {
+                mAdapter.notifyDataSetChanged();
+                // Create a new runnable to perform the click event.
+                // Caution! When using the system back
+                viewBeginTwoPane = new Runnable() {
+                    @Override
+                    public void run() {
+                        mAdapter.setClickSelect(getActivity(), cursor, 0);
+                    }
+                };
+                // Launch a new thread to perform the action.
+                Thread thread = new Thread(null, viewBeginTwoPane, "MagentoBackground");
+                thread.start();
+            }
+
         }
     }
 
