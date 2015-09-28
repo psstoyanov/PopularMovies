@@ -207,7 +207,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 data.getDouble(COL_POPULARITY));
 
         mMovieStr = String.format("%s - %s - %s/%s", movieTitleString, movieOverView, movieRating, moviePopularity);
-        Log.d(LOG_TAG, data.getString(COL_OVERVIEW));
+        //Log.d(LOG_TAG, data.getString(COL_OVERVIEW));
 
 
         TextView detailMovieTitleTextView = (TextView) getView().findViewById(R.id.detail_movie_title);

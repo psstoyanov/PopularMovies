@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.SyncStateContract;
 import android.util.Log;
 
 import com.example.android.popularmovies.Constans;
@@ -68,6 +69,7 @@ public class PopularMoviesService extends IntentService {
             final String SORT_PARAM = "sort_by";
             final String PAGE_PARAM = "page";
             final String KEY_PARAM = "api_key";
+            final String APPEND_DURATION = "append_to_response";
 
             Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
                     .appendQueryParameter(SORT_PARAM, sortQuery + sort_desc)
@@ -211,6 +213,10 @@ public class PopularMoviesService extends IntentService {
                 movie_title = movieObject.getString(MDB_TITLE);
                 movie_release_date = movieObject.getString(MDB_RELEASE_DATE);
                 movie_id = movieObject.getInt(MDB_ID);
+                String test_something = "http://api.themoviedb.org/3/movie/"
+                        + movie_id + "?api_key=" + Constans.MOVIEDB_API_KEY
+                        + "&append_to_response=videos,reviews";
+                Log.d(LOG_TAG, test_something);
 
                 movie_overview = movieObject.getString(MDB_OVERVIEW);
 
