@@ -63,6 +63,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MoviesContract.MoviesEntry.COLUMN_POPULARITY,
             MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE,
             MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME
     };
     // These indices are tied to DISCOVER_MOVIES_COLUMNS.  If DISCOVER_MOVIES_COLUMNS changes, these
     // must change.
@@ -75,6 +76,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_POPULARITY = 5;
     static final int COL_VOTE_AVERAGE = 6;
     static final int COL_RELEASE_DATE = 7;
+    static final int COL_RUNTIME = 8;
+
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -198,6 +201,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         String movieReleaseDate = data.getString(COL_RELEASE_DATE);
 
+        String movieRuntime = data.getString(COL_RUNTIME);
+
         String movieThumbnail = data.getString(COL_POSTER_PATH);
 
         String movieRating = Utility.formatRating(
@@ -206,7 +211,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         String moviePopularity = Utility.formatRating(
                 data.getDouble(COL_POPULARITY));
 
-        mMovieStr = String.format("%s - %s - %s/%s", movieTitleString, movieOverView, movieRating, moviePopularity);
+        mMovieStr = String.format("%s   %s   %s/%s", movieTitleString, movieOverView, movieRating, moviePopularity);
         //Log.d(LOG_TAG, data.getString(COL_OVERVIEW));
 
 
@@ -215,6 +220,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         TextView detailMovieReleaseDateView = (TextView) getView().findViewById(R.id.detail_movie_releasedate);
         detailMovieReleaseDateView.setText(movieReleaseDate);
+        TextView detailMovieRuntimeView = (TextView) getView().findViewById(R.id.detail_movie_runtime);
+        detailMovieRuntimeView.setText(movieRuntime + " min");
         TextView detailMovieRatingView = (TextView) getView().findViewById(R.id.detail_movie_rating);
         detailMovieRatingView.setText(movieRating);
         TextView detailMovieOverView = (TextView) getView().findViewById(R.id.detail_movie_overview);

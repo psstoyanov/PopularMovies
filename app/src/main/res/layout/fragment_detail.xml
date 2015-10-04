@@ -29,7 +29,8 @@
                 android:id="@+id/detail_movie_thumbnail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:src="@drawable/blank_thumbnail"/>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -44,7 +45,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:text="20-06-1991"/>
+                <TextView
+                    android:id="@+id/detail_movie_runtime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="20sp"
+                    android:text="120min"
+                    />
 
                 <TextView
                     android:id="@+id/detail_movie_rating"
@@ -52,7 +62,12 @@
 
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"
+                    android:text="8.2/ 10"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="20sp"
+                    android:text="Favourite"/>
             </LinearLayout>
         </LinearLayout>
 

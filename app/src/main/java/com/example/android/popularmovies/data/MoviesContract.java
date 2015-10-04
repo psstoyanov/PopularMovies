@@ -117,6 +117,18 @@ public class MoviesContract
         // Movie overview as provided by API.
         public static final String COLUMN_OVERVIEW = "movie_overview";
 
+        // Movie tag line as provided by API in extra.
+        public static final String COLUMN_MOVIE_TAGLINE = "movie_tagline";
+
+        // Movie backdrop image as provided by API in extra.
+        public static final String COLUMN_MOVIE_BACKDROP_IMG = "movie_backdrop_img";
+
+        // Movie homepage as provided by API in extra.
+        public static final String COLUMN_MOVIE_HOMEPAGE = "movie_homepage";
+
+        // Movie runtime as provided by API in extra.
+        public static final String COLUMN_MOVIE_RUNTIME = "movie_rintime";
+
         // The movie rating and popularity (stored as floats)
         public static final String COLUMN_POPULARITY = "popularity";
         public static final String COLUMN_VOTE_AVERAGE = "rating";

@@ -28,7 +28,7 @@ import com.example.android.popularmovies.data.MoviesContract.MoviesEntry;
 public class MoviesDBHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "movies.db";
 
@@ -60,6 +60,10 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
                 MoviesEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_RELEASE_DATE + " TEXT NOT NULL, " +
                 MoviesEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL ," +
+                MoviesEntry.COLUMN_MOVIE_TAGLINE + " TEXT NOT NULL, " +
+                MoviesEntry.COLUMN_MOVIE_RUNTIME + " INTEGER NOT NULL, " +
+                MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG + " TEXT NOT NULL, " +
+                MoviesEntry.COLUMN_MOVIE_HOMEPAGE + " TEXT NOT NULL, " +
 
                 MoviesEntry.COLUMN_POPULARITY + " INTEGER NOT NULL, " +
                 MoviesEntry.COLUMN_VOTE_AVERAGE + " INTEGER NOT NULL, " +
@@ -73,6 +77,8 @@ public class MoviesDBHelper extends SQLiteOpenHelper {
 
                 // To assure the application have just one movie entry from the database
                 // per sort order, it's created a UNIQUE constraint with REPLACE strategy
+                // However, now that we want to add movies to the Favourites
+                // sort order the DBHelper has to allow duplicates.
                 " UNIQUE (" + MoviesEntry.COLUMN_MOVIE_ID + ", " +
                 MoviesEntry.COLUMN_SORT_KEY + ") ON CONFLICT REPLACE);";
 

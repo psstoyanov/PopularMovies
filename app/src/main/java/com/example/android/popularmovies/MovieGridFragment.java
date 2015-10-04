@@ -181,7 +181,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
         AlarmManager am=(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
         //Set the AlarmManager to wake up the system.
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pi);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pi);
 
     }
 

@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
 import java.util.Vector;
 
 /**
@@ -69,7 +70,6 @@ public class PopularMoviesService extends IntentService {
             final String SORT_PARAM = "sort_by";
             final String PAGE_PARAM = "page";
             final String KEY_PARAM = "api_key";
-            final String APPEND_DURATION = "append_to_response";
 
             Uri builtUri = Uri.parse(MOVIE_BASE_URL).buildUpon()
                     .appendQueryParameter(SORT_PARAM, sortQuery + sort_desc)
@@ -129,6 +129,83 @@ public class PopularMoviesService extends IntentService {
         }
     }
 
+    private JSONObject fetchAdditionalMovieData(int movieId) {
+
+        // These two need to be declared outside the try/catch
+        // so that they can be closed in the finally block.
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        // Will contain the raw JSON response as a string.
+        String moviedbextraJsonStr = null;
+        JSONObject moviesdataJson = new JSONObject();
+
+        try {
+            // Construct the URL for the MovieDBApi query
+            // Possible parameters are avaiable at MDB page API page, at
+            // http://docs.themoviedb.apiary.io/#reference/discover/discovermovie
+            final String MOVIE_EXTRA_BASE_URL =
+                    "http://api.themoviedb.org/3/movie/";
+            final String KEY_PARAM = "api_key";
+
+            Uri builtUri = Uri.parse(MOVIE_EXTRA_BASE_URL + String.valueOf(movieId)).buildUpon()
+                    .appendQueryParameter(KEY_PARAM, Constans.MOVIEDB_API_KEY)
+                    .build();
+
+            URL url = new URL(builtUri.toString());
+            // Create the request to MovieDB, and open the connection
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            // Read the input stream into a String
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return null;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                // Since it's JSON, adding a newline isn't necessary (it won't affect parsing)
+                // But it does make debugging a *lot* easier if you print out the completed
+                // buffer for debugging.
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return null;
+            }
+
+            moviedbextraJsonStr = buffer.toString();
+            moviesdataJson = new JSONObject(moviedbextraJsonStr);
+
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error ", e);
+            // If the code didn't successfully get the weather data, there's no point in attemping
+            // to parse it.
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
+            }
+        }
+        return moviesdataJson;
+    }
+
+
     /**
      * Take the String representing the complete forecast in JSON Format and
      * pull out the data we need to construct the Strings needed for the wireframes.
@@ -160,6 +237,11 @@ public class PopularMoviesService extends IntentService {
         final String MDB_VOTE_AVARAGE = "vote_average";
         final String MDB_ID = "id";
 
+        final String MDB_EXTRA_BACKDROP_IMG  = "backdrop_path";
+        final String MDB_EXTRA_HOMEPAGE  = "homepage";
+        final String MDB_EXTRA_RUNTIME  = "runtime";
+        final String MDB_EXTRA_TAGLINE  = "tagline";
+
         try {
             JSONObject moviesdataJson = new JSONObject(moviesdataJsonStr);
             JSONArray movieArray = moviesdataJson.getJSONArray(MDB_RESULTS);
@@ -185,12 +267,21 @@ public class PopularMoviesService extends IntentService {
 
             for (int i = 0; i < movieArray.length(); i++) {
                 // These are the values that will be collected.
+
+                // The title, release date and the movie ID.
                 String movie_title;
                 String movie_release_date;
                 int movie_id;
 
-                String movie_overview;
+                //The runtime and homepage.
+                int movie_runtime;
+                String movie_homepage;
 
+                // The tagline and overview.
+                String movie_overview;
+                String movie_tagline;
+
+                // Popularity and rating.
                 double movie_popularity;
                 double movie_rating;
 
@@ -199,9 +290,13 @@ public class PopularMoviesService extends IntentService {
                 // TODO: optimize the target image size
                 // TODO: Lesson 5- Video 19 "Adding images to the app"
                 String sizeImg = "w185//";
+                String sizeBackdrop = "w500";
+                // The strings for the thumbnail and backdrop images
                 String movie_thumbnail_base;
                 String movie_thumbnail;
 
+                String movie_backdrop_base;
+                String movie_backdrop;
 
                 //String description;
                 //int weatherId;
@@ -213,27 +308,42 @@ public class PopularMoviesService extends IntentService {
                 movie_title = movieObject.getString(MDB_TITLE);
                 movie_release_date = movieObject.getString(MDB_RELEASE_DATE);
                 movie_id = movieObject.getInt(MDB_ID);
-                String test_something = "http://api.themoviedb.org/3/movie/"
-                        + movie_id + "?api_key=" + Constans.MOVIEDB_API_KEY
-                        + "&append_to_response=videos,reviews";
-                Log.d(LOG_TAG, test_something);
 
+                // Fetch the additional data for the movie as we now have the movieID.
+                JSONObject movieExtra = fetchAdditionalMovieData(movie_id);
+
+                //Grag the runtime and homepage.
+                movie_runtime = movieExtra.getInt(MDB_EXTRA_RUNTIME);
+                movie_homepage = movieExtra.getString(MDB_EXTRA_HOMEPAGE);
+
+
+                // Grab the tagline and overview.
+                movie_tagline = movieExtra.getString(MDB_EXTRA_TAGLINE);
                 movie_overview = movieObject.getString(MDB_OVERVIEW);
 
+                // Grab the popularity and rating.
                 movie_popularity = movieObject.getDouble(MDB_POPULARITY);
                 movie_rating = movieObject.getDouble(MDB_VOTE_AVARAGE);
 
+                // Grab the thumbnail base and create the thumbnail URL page.
                 movie_thumbnail_base = movieObject.getString(MDB_POSTER);
                 movie_thumbnail = baseImgURL + sizeImg + movie_thumbnail_base;
 
+                // Grab the backdrop base and create the backdrop URL page.
+                movie_backdrop_base = movieExtra.getString(MDB_EXTRA_BACKDROP_IMG);
+                movie_backdrop = baseImgURL + sizeBackdrop + movie_backdrop_base;
 
                 ContentValues moviesValues = new ContentValues();
 
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortorderID);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, movie_title);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, movie_id);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE,movie_tagline);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, movie_overview);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH, movie_thumbnail);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG, movie_backdrop);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME, movie_runtime);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_HOMEPAGE, movie_homepage);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POPULARITY, movie_popularity);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE, Utility.formatRating(movie_rating));
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, movie_release_date);
@@ -247,6 +357,36 @@ public class PopularMoviesService extends IntentService {
                 // Student: call bulkInsert to add the weatherEntries to the database here
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
+
+                // Move to a cleaner function to clear the DB
+                int i = 0, k = 0;
+                Cursor testCursor = this.getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI,
+                        null, null,
+                        null, MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                if (testCursor.moveToFirst()) {
+                    int locationIdIndx = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                    String firstSortOrder =
+                            testCursor.getString(
+                                    locationIdIndx);
+                    while (testCursor.isAfterLast() == false) {
+                        //testCursor.moveToNext();
+                        int locationIdIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                        int theMovieId = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
+                        int locationIIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                        String currSort = testCursor.getString(locationIdIndex);
+                        if (testCursor.getLong(locationIdIndex) == sortorderID) {
+                            i++;
+                            // HELLLS YEAH!!!! FIXED THE DELETE FUNCTION!!!
+                            // USE THIS FOR THE FAVOURITES!!!!
+                            this.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI,
+                                    MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, null);
+                        } else k++;
+                        Log.d(LOG_TAG, testCursor.getString(locationIdIndex) + " the movie id " + testCursor.getString(theMovieId));
+                        testCursor.moveToNext();
+                    }
+                    Log.d(LOG_TAG, "the overall size of the cursor " + testCursor.getCount());
+                    Log.d(LOG_TAG, "all entries form sort 1 " + i + " from sort 2 " + k);
+                }
                 inserted = this.getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
             }
 

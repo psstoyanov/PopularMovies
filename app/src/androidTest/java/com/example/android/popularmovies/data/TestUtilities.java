@@ -53,6 +53,10 @@ public class TestUtilities extends AndroidTestCase {
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, TEST_DATE);
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, "Despicable me");
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, "Asteroids");
+        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG, "backdrop.jpg");
+        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_HOMEPAGE, "http://Despicableme.com");
+        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME, 22);
+        moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE, "Gru is awesome");
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POPULARITY, 1.2);
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE, 1.3);
         moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH, "blahblah.jpg");

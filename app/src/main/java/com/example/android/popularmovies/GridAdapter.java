@@ -53,7 +53,7 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder> {
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.grid_item, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
-        Log.d(TAG, "Cursor pos: " + getCursor().getPosition());
+        //Log.d(TAG, "Cursor pos: " + getCursor().getPosition());
         return viewHolder;
     }
 
