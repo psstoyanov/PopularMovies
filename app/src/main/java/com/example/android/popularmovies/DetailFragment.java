@@ -63,7 +63,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MoviesContract.MoviesEntry.COLUMN_POPULARITY,
             MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE,
             MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE,
-            MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG
     };
     // These indices are tied to DISCOVER_MOVIES_COLUMNS.  If DISCOVER_MOVIES_COLUMNS changes, these
     // must change.
@@ -77,6 +79,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_VOTE_AVERAGE = 6;
     static final int COL_RELEASE_DATE = 7;
     static final int COL_RUNTIME = 8;
+    static final int COL_TAGLINE = 9;
+    static final int COL_BACKDROP_IMG = 10;
 
 
     public DetailFragment() {
@@ -201,9 +205,13 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         String movieReleaseDate = data.getString(COL_RELEASE_DATE);
 
+        String movieTagling = data.getString(COL_TAGLINE);
+
         String movieRuntime = data.getString(COL_RUNTIME);
 
         String movieThumbnail = data.getString(COL_POSTER_PATH);
+
+        String movieBackdropImg = data.getString(COL_BACKDROP_IMG);
 
         String movieRating = Utility.formatRating(
                 data.getDouble(COL_VOTE_AVERAGE));
@@ -215,21 +223,36 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         //Log.d(LOG_TAG, data.getString(COL_OVERVIEW));
 
 
+        // Set the title
         TextView detailMovieTitleTextView = (TextView) getView().findViewById(R.id.detail_movie_title);
         detailMovieTitleTextView.setText(movieTitleString);
-
+        // Set the release date
         TextView detailMovieReleaseDateView = (TextView) getView().findViewById(R.id.detail_movie_releasedate);
         detailMovieReleaseDateView.setText(movieReleaseDate);
+        // Set the runtime
         TextView detailMovieRuntimeView = (TextView) getView().findViewById(R.id.detail_movie_runtime);
-        detailMovieRuntimeView.setText(movieRuntime + " min");
+        Log.d(LOG_TAG, movieRuntime);
+        if (Integer.parseInt(movieRuntime) != 0) {
+            detailMovieRuntimeView.setText(movieRuntime + " min");
+        }
+        // Set the Rating
         TextView detailMovieRatingView = (TextView) getView().findViewById(R.id.detail_movie_rating);
         detailMovieRatingView.setText(movieRating);
+
+        TextView detailMovieTaglineView = (TextView) getView().findViewById(R.id.detail_movie_tagline);
+        detailMovieTaglineView.setText(movieTagling);
+        // Set the overview
         TextView detailMovieOverView = (TextView) getView().findViewById(R.id.detail_movie_overview);
         detailMovieOverView.setText(movieOverView);
 
+        // Set the thumbnail
         ImageView movieThumbnailView = (ImageView) getView().findViewById(R.id.detail_movie_thumbnail);
         Picasso.with(getActivity()).load(movieThumbnail).placeholder(R.drawable.blank_thumbnail)
                 .fit().centerInside().into(movieThumbnailView);
+        // Set the backdrop image
+        ImageView movieBackdropView = (ImageView) getView().findViewById(R.id.detail_movie_backdrop);
+        Picasso.with(getActivity()).load(movieBackdropImg).placeholder(R.drawable.blank_thumbnail)
+                .fit().centerInside().into(movieBackdropView);
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActioProvider != null) {

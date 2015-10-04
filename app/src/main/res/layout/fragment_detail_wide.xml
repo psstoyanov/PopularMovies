@@ -23,6 +23,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/detail_movie_backdrop"
                 android:layout_width="match_parent"
@@ -32,12 +33,12 @@
                 android:src="@drawable/blank_thumbnail" />
 
             <LinearLayout
-                android:paddingTop="150dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@android:color/transparent"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:background="@android:color/transparent"
+                android:orientation="horizontal"
+                android:paddingTop="150dp">
 
                 <ImageView
                     android:id="@+id/detail_movie_thumbnail"
@@ -54,38 +55,68 @@
                     android:paddingLeft="15dp">
 
                     <TextView
-                        android:id="@+id/detail_movie_releasedate"
+                        android:id="@+id/detail_movie_tagline"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
                         android:textColor="@android:color/white"
                         android:shadowColor="@android:color/black"
                         android:shadowDx="1"
                         android:shadowDy="1"
-                        android:shadowRadius="2"
+                        android:shadowRadius="4"
+                        android:text="The tag line"
+                        android:textSize="25sp"
+                        />
+
+                    <TextView
+                        android:id="@+id/detail_movie_releasedate"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
                         android:layout_weight="1"
                         android:gravity="center_horizontal"
+                        android:textColor="@android:color/white"
+                        android:shadowColor="@android:color/black"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="4"
                         android:text="Release Date: 2015"
                         android:textSize="25sp" />
 
-                    <TextView
-                        android:id="@+id/detail_movie_runtime"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:text="120min"
-                        android:textSize="20sp" />
+                        android:layout_height="0dp"
+                        android:orientation="horizontal"
+                        android:layout_weight="1">
 
-                    <TextView
-                        android:id="@+id/detail_movie_rating"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_weight="1"
-                        android:gravity="center_horizontal"
-                        android:text="7.2/10.0"
-                        android:textSize="25sp" />
+                        <TextView
+                            android:id="@+id/detail_movie_runtime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:shadowColor="@android:color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="4"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp" />
+
+                        <TextView
+                            android:id="@+id/detail_movie_rating"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:layout_weight="1"
+                            android:gravity="center_horizontal"
+                            android:shadowColor="@android:color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="4"
+                            android:text="7.2/10.0"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp" />
+                    </LinearLayout>
 
                     <Button
                         android:layout_width="wrap_content"

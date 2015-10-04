@@ -274,7 +274,7 @@ public class PopularMoviesService extends IntentService {
                 int movie_id;
 
                 //The runtime and homepage.
-                int movie_runtime;
+                String movie_runtime;
                 String movie_homepage;
 
                 // The tagline and overview.
@@ -313,7 +313,8 @@ public class PopularMoviesService extends IntentService {
                 JSONObject movieExtra = fetchAdditionalMovieData(movie_id);
 
                 //Grag the runtime and homepage.
-                movie_runtime = movieExtra.getInt(MDB_EXTRA_RUNTIME);
+                movie_runtime = movieExtra.getString(MDB_EXTRA_RUNTIME);
+
                 movie_homepage = movieExtra.getString(MDB_EXTRA_HOMEPAGE);
 
 
