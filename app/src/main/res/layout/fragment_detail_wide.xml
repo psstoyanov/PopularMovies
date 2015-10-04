@@ -65,7 +65,6 @@
                         android:shadowDx="1"
                         android:shadowDy="1"
                         android:shadowRadius="4"
-                        android:text="The tag line"
                         android:textSize="25sp"
                         />
 
@@ -80,7 +79,6 @@
                         android:shadowDx="1"
                         android:shadowDy="1"
                         android:shadowRadius="4"
-                        android:text="Release Date: 2015"
                         android:textSize="25sp" />
 
                     <LinearLayout

@@ -205,9 +205,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         String movieReleaseDate = data.getString(COL_RELEASE_DATE);
 
-        String movieTagling = data.getString(COL_TAGLINE);
+        String movieTagline = data.getString(COL_TAGLINE);
 
-        String movieRuntime = data.getString(COL_RUNTIME);
+        Integer movieRuntime = data.getInt(COL_RUNTIME);
 
         String movieThumbnail = data.getString(COL_POSTER_PATH);
 
@@ -228,19 +228,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         detailMovieTitleTextView.setText(movieTitleString);
         // Set the release date
         TextView detailMovieReleaseDateView = (TextView) getView().findViewById(R.id.detail_movie_releasedate);
-        detailMovieReleaseDateView.setText(movieReleaseDate);
+        if (movieReleaseDate.length() > 0 && !movieReleaseDate.equals("null")) {
+            detailMovieReleaseDateView.setText(movieReleaseDate);
+        }
         // Set the runtime
         TextView detailMovieRuntimeView = (TextView) getView().findViewById(R.id.detail_movie_runtime);
-        Log.d(LOG_TAG, movieRuntime);
-        if (Integer.parseInt(movieRuntime) != 0) {
+        if (movieRuntime != null && movieRuntime != 0) {
             detailMovieRuntimeView.setText(movieRuntime + " min");
         }
+
         // Set the Rating
         TextView detailMovieRatingView = (TextView) getView().findViewById(R.id.detail_movie_rating);
-        detailMovieRatingView.setText(movieRating);
+        if (movieRating.length() > 0 && !movieRating.equals("null")) {
+            detailMovieRatingView.setText(movieRating);
+        }
 
+        // Set the tagline
         TextView detailMovieTaglineView = (TextView) getView().findViewById(R.id.detail_movie_tagline);
-        detailMovieTaglineView.setText(movieTagling);
+        //Make the check for null string.
+        if (movieTagline.length() > 0 && !movieTagline.equals("null")) {
+            detailMovieTaglineView.setText(movieTagline);
+        }
         // Set the overview
         TextView detailMovieOverView = (TextView) getView().findViewById(R.id.detail_movie_overview);
         detailMovieOverView.setText(movieOverView);
