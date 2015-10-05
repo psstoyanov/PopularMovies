@@ -277,7 +277,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             // Otherwise, the app will crash when first loaded
             // as the tables are empty.
             if (mAdapter.getItemCount() == cursor.getCount() &&
-                    mAdapter.getItemCount()!= 0)
+                    mAdapter.getItemCount()> 0 )
             {
                 mAdapter.notifyDataSetChanged();
                 // Create a new runnable to perform the click event.
@@ -285,6 +285,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
                 viewBeginTwoPane = new Runnable() {
                     @Override
                     public void run() {
+                        if (cursor.moveToFirst())
                         mAdapter.setClickSelect(getActivity(), cursor, 0);
                     }
                 };

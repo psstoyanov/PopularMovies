@@ -47,6 +47,12 @@ public class PopularMoviesService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         String sortQuery = intent.getStringExtra(SORT_ORDER_QUERY_EXTRA);
+        if (sortQuery == "favorite")
+        {
+            long sortorderID = addsortOrder(sortQuery);
+            return;
+        }
+
         String sort_desc = ".desc";
         /* By default, the first page of results will be shown.
             *  TheMovieDB API displays 20 results per page.

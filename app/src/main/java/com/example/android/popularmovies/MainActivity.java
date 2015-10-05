@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             DetailFragment fragment = new DetailFragment();
             fragment.setArguments(args);
 
+
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.movie_detail_container, fragment, DETAILMOVIEFRAGMENT_TAG)
                     .commit();

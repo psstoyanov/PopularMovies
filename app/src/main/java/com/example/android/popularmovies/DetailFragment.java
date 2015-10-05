@@ -4,6 +4,8 @@ package com.example.android.popularmovies;
  * Created by Raz3r on 23/08/15.
  */
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,6 +27,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -33,10 +36,12 @@ import com.example.android.popularmovies.Adapters.VideosRecyclerAdapter;
 import com.example.android.popularmovies.ObjectModel.Videos;
 import com.example.android.popularmovies.Utils.CustomLinearLayoutManager;
 import com.example.android.popularmovies.data.MoviesContract;
+import com.example.android.popularmovies.services.PopularMoviesService;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -55,6 +60,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private String mMovieStr;
 
     private Uri mUri;
+
+    private boolean FavoriteButtonActive;
+
+    Button mFavoriteButton;
 
     private static final int DETAIL_LOADER = 0;
 
@@ -76,7 +85,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE,
             MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME,
             MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE,
-            MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_HOMEPAGE
     };
     // These indices are tied to DISCOVER_MOVIES_COLUMNS.  If DISCOVER_MOVIES_COLUMNS changes, these
     // must change.
@@ -92,6 +102,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_RUNTIME = 8;
     static final int COL_TAGLINE = 9;
     static final int COL_BACKDROP_IMG = 10;
+    static final int COL_HOMEPAGE = 11;
 
     // The videos recycler view.
     RecyclerView mVideoRecyclerView;
@@ -103,6 +114,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     RecyclerView mReviewsRecyclerView;
     RecyclerView.LayoutManager mReviewsLayoutManager;
     ReviewsRecyclerAdapter mReviewsAdapter;
+
+
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -125,7 +138,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 ((TextView) rootView.findViewById(R.id.detail_text)).setText(mMovieStr);
             }*/
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
-
 
         // Calling the RecyclerViews
         mVideoRecyclerView = (RecyclerView) view.findViewById(R.id.video_recycler_view);
@@ -244,27 +256,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             return;
         }
 
-        String movieTitleString = data.getString(COL_MOVIE_TITLE);
+        final String movieTitleString = data.getString(COL_MOVIE_TITLE);
 
-        String movieOverView =
+        final String movieID = data.getString(COL_MOVIE_ID);
+
+        final String movieOverView =
                 data.getString(COL_OVERVIEW);
 
         //boolean isMetric = Utility.isMetric(getActivity());
 
-        String movieReleaseDate = data.getString(COL_RELEASE_DATE);
+        final String movieReleaseDate = data.getString(COL_RELEASE_DATE);
 
-        String movieTagline = data.getString(COL_TAGLINE);
+        final String movieTagline = data.getString(COL_TAGLINE);
 
-        Integer movieRuntime = data.getInt(COL_RUNTIME);
+        final Integer movieRuntime = data.getInt(COL_RUNTIME);
 
-        String movieThumbnail = data.getString(COL_POSTER_PATH);
+        final String movieThumbnail = data.getString(COL_POSTER_PATH);
 
-        String movieBackdropImg = data.getString(COL_BACKDROP_IMG);
+        final String movieBackdropImg = data.getString(COL_BACKDROP_IMG);
 
-        String movieRating = Utility.formatRating(
+        final String movieHomePage = data.getString(COL_HOMEPAGE);
+
+        final String movieRating = Utility.formatRating(
                 data.getDouble(COL_VOTE_AVERAGE));
 
-        String moviePopularity = Utility.formatRating(
+        final String moviePopularity = Utility.formatRating(
                 data.getDouble(COL_POPULARITY));
 
         mMovieStr = String.format("%s   %s   %s/%s", movieTitleString, movieOverView, movieRating, moviePopularity);
@@ -319,6 +335,58 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity(),mReviewsAdapter);
         FetchReview.execute(data.getString(COL_MOVIE_ID));
 
+        mFavoriteButton = (Button) getView().findViewById(R.id.favorite_button);
+
+
+
+        mFavoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "Favorite button clicked");
+
+                long sortorderID = addsortOrder("favorite");
+                Vector<ContentValues> cVVector = new Vector<ContentValues>(1);
+
+                String movie_title = movieTitleString;
+                String movie_id = movieID;
+                String movie_tagline =movieTagline;
+                String movie_overview = movieOverView;
+                String movie_thumbnail = movieThumbnail;
+                String movie_backdrop = movieBackdropImg;
+                int movie_runtime = movieRuntime;
+                String movie_homepage = movieHomePage;
+                String movie_popularity = moviePopularity;
+                String movie_rating = movieRating;
+                String movie_release_date = movieReleaseDate;
+
+                ContentValues moviesValues = new ContentValues();
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortorderID);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, movie_title);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, movie_id);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE,movie_tagline);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, movie_overview);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH, movie_thumbnail);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG, movie_backdrop);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_RUNTIME, movie_runtime);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_HOMEPAGE, movie_homepage);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POPULARITY, movie_popularity);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_VOTE_AVERAGE, movie_rating);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_RELEASE_DATE, movie_release_date);
+
+                Log.d(LOG_TAG, movie_title);
+
+                cVVector.add(moviesValues);
+                // add to database
+                if (cVVector.size() > 0) {
+                    //Log.d(LOG_TAG, String.valueOf(cVVector.size()));
+                    // Student: call bulkInsert to add the weatherEntries to the database here
+                    ContentValues[] cvArray = new ContentValues[cVVector.size()];
+                    cVVector.toArray(cvArray);
+                    getActivity().getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
+                }
+            }
+        });
+
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActioProvider != null) {
@@ -330,4 +398,49 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
     }
+
+    long addsortOrder(String sortSetting) {
+
+        long sortRowId;
+
+        // Students: First, check if the location with this city name exists in the db
+        Cursor sortCursor = getActivity().getContentResolver().query(
+                MoviesContract.SortEntry.CONTENT_URI,
+                new String[]{MoviesContract.SortEntry._ID},
+                MoviesContract.SortEntry.COLUMN_SORT_SETTING + " = ?",
+                new String[]{sortSetting},
+                null);
+        if (sortCursor.moveToFirst()) {
+            int locationIdIndex = sortCursor.getColumnIndex(MoviesContract.SortEntry._ID);
+            sortRowId = sortCursor.getLong(locationIdIndex);
+        } else {
+            // Now that the content provider is set up, inserting rows of data is pretty simple.
+            // First create a ContentValues object to hold the data you want to insert.
+            ContentValues sortValues = new ContentValues();
+
+            // Then add the data, along with the corresponding name of the data type,
+            // so the content provider knows what kind of value is being inserted.
+            //sortValues.put(MoviesContract.SortEntry.COLUMN_CITY_NAME, cityName);
+            sortValues.put(MoviesContract.SortEntry.COLUMN_SORT_SETTING, sortSetting);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
+            //sortValues.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
+
+            // Finally, insert location data into the database.
+            Uri insertedUri = getActivity().getContentResolver().insert(
+                    MoviesContract.SortEntry.CONTENT_URI,
+                    sortValues
+            );
+
+            // The resulting URI contains the ID for the row.  Extract the locationId from the Uri.
+            sortRowId = ContentUris.parseId(insertedUri);
+        }
+        sortCursor.close();
+        // Wait, that worked?  Yes!
+        return sortRowId;
+        // If it exists, return the current ID
+        // Otherwise, insert it using the content resolver and the base URI
+    }
+
 }
