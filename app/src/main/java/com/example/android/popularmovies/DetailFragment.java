@@ -133,7 +133,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mVideoRecyclerView.setLayoutManager(mVideoLayoutManager);
         mVideoRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-        mVideoAdapter = new VideosRecyclerAdapter();
+        mVideoAdapter = new VideosRecyclerAdapter(getActivity());
 
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -141,10 +141,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         mVideoRecyclerView.setAdapter(mVideoAdapter);
-        mVideoAdapter.add(list.get(0), 0);
-        mVideoAdapter.add(list.get(1), 1);
-        mVideoAdapter.add(list.get(2), 2);
-        mVideoAdapter.notifyDataSetChanged();
+
         return view;
     }
 
@@ -303,7 +300,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         Picasso.with(getActivity()).load(movieBackdropImg).placeholder(R.drawable.blank_thumbnail)
                 .fit().centerInside().into(movieBackdropView);
 
-        FetchVideosTask FetchVideo= new FetchVideosTask(getActivity());
+        FetchVideosTask FetchVideo= new FetchVideosTask(getActivity(),mVideoAdapter);
         FetchVideo.execute(data.getString(COL_MOVIE_ID));
         FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity());
         FetchReview.execute(data.getString(COL_MOVIE_ID));

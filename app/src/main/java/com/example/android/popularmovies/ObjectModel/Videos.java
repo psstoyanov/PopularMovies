@@ -39,10 +39,22 @@ public class Videos implements Parcelable {
         mVideoType = videoData[5];
     }
 
-    public String getName()
-    {
-        return  mVideoName;
+    public String getName() {
+        return mVideoName;
     }
+
+    public String getmVideoKey() {
+        return mVideoKey;
+    }
+
+    public String getmVideoSite() {
+        return mVideoSite;
+    }
+
+    public String getmVideoSize() {
+        return mVideoSize;
+    }
+
 
     @Override
     public int describeContents() {
@@ -60,6 +72,7 @@ public class Videos implements Parcelable {
                 mVideoType
         });
     }
+
     public static final Creator<Videos> CREATOR = new Creator<Videos>() {
 
         @Override

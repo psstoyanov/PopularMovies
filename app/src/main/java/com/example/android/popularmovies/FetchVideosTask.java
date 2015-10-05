@@ -21,6 +21,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.popularmovies.Adapters.VideosRecyclerAdapter;
+import com.example.android.popularmovies.ObjectModel.Videos;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,21 +34,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
-public class FetchVideosTask extends AsyncTask<String, Void, Void> {
+public class FetchVideosTask extends AsyncTask<String, Void, ArrayList<Videos>> {
 
     private final String LOG_TAG = FetchVideosTask.class.getSimpleName();
 
-    private GridAdapter mAdapter;
+    private VideosRecyclerAdapter mVideosAdapter;
 
-    private ArrayAdapter<String> mMoviesAdapter;
+    //private ArrayAdapter<String> mVideosAdapter;
     private final Context mContext;
 
     String movieID;
     String itemToReturn;
 
-    public FetchVideosTask(Context context) {
+    public FetchVideosTask(Context context,VideosRecyclerAdapter videoadapter) {
         mContext = context;
+        mVideosAdapter = videoadapter;
         //mAdapter = moviesAdapter;
     }
 
@@ -108,8 +113,11 @@ public class FetchVideosTask extends AsyncTask<String, Void, Void> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private Void getVideosReviewDataFromJson(String moviesdataJsonStr)
+    private ArrayList<Videos> getVideosReviewDataFromJson(String moviesdataJsonStr)
             throws JSONException {
+
+        // The ArrayList of Videos to be returned.
+        ArrayList<Videos> videoToReturn = new ArrayList<>();
 
         // Now we have a String representing the complete forecast in JSON Format.
         // Fortunately parsing is easy:  constructor takes the JSON string and converts it
@@ -175,9 +183,13 @@ public class FetchVideosTask extends AsyncTask<String, Void, Void> {
                 videoSite = movieObject.getString(MDB_SITE);
                 videoSize = movieObject.getString(MDB_SIZE);
                 videoType = movieObject.getString(MDB_TYPE);
-                Log.d(LOG_TAG, videoId);
+                Log.d(LOG_TAG, videoName);
+                Videos newVideo = new Videos(videoId,videoKey,
+                        videoName,videoSite,videoSize,videoType);
+                videoToReturn.add(newVideo);
+                //Log.d(LOG_TAG, videoId);
             }
-
+            return videoToReturn;
             /*// Sort order:  Ascending, by date.
             // String sortOrder = MoviesEntry.COLUMN_VOTE_AVERAGE + " ASC";
              //Uri weatherForLocationUri = MoviesEntry.buildWeatherLocationWithStartDate(
@@ -225,7 +237,7 @@ public class FetchVideosTask extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected ArrayList<Videos> doInBackground(String... params) {
 
         // If there's no zip code, there's nothing to look up.  Verify size of params.
         if (params.length == 0) {
@@ -259,6 +271,7 @@ public class FetchVideosTask extends AsyncTask<String, Void, Void> {
                     .build();
 
             URL url = new URL(builtUri.toString());
+            //Log.d(LOG_TAG, String.valueOf(url));
 
             // Create the request to MovieDB, and open the connection
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -287,7 +300,8 @@ public class FetchVideosTask extends AsyncTask<String, Void, Void> {
                 return null;
             }
             moviedbJsonStr = buffer.toString();
-            getVideosReviewDataFromJson(moviedbJsonStr);
+            ArrayList<Videos> videosToReturn =  getVideosReviewDataFromJson(moviedbJsonStr);
+            return videosToReturn;
             //Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
 
         } catch (IOException e) {
@@ -320,16 +334,16 @@ public class FetchVideosTask extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-    /*@Override
-    protected void onPostExecute(String[] result) {
-        if (result != null && mMoviesAdapter != null) {
-            mMoviesAdapter.clear();
-            for(String dayForecastStr : result) {
-                mMoviesAdapter.add(dayForecastStr);
+    @Override
+    protected void onPostExecute(ArrayList<Videos> result) {
+        if (result != null && mVideosAdapter != null) {
+            mVideosAdapter.clear();
+            for(Videos videoObject : result) {
+                mVideosAdapter.add(videoObject);
             }
             // New data is back from the server.  Hooray!
         }
-    }*/
+    }
     /*@Override
     protected void onPostExecute(PopularMovieGridItem[] results)
     {
