@@ -39,6 +39,11 @@ public class Videos implements Parcelable {
         mVideoType = videoData[5];
     }
 
+    public String getName()
+    {
+        return  mVideoName;
+    }
+
     @Override
     public int describeContents() {
         return 0;

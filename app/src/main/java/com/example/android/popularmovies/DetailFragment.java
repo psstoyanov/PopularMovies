@@ -13,6 +13,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,8 +28,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.Adapters.VideosRecyclerAdapter;
+import com.example.android.popularmovies.ObjectModel.Videos;
+import com.example.android.popularmovies.Utils.CustomLinearLayoutManager;
 import com.example.android.popularmovies.data.MoviesContract;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -82,6 +92,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_TAGLINE = 9;
     static final int COL_BACKDROP_IMG = 10;
 
+    RecyclerView mVideoRecyclerView;
+    RecyclerView.LayoutManager mVideoLayoutManager;
+    VideosRecyclerAdapter mVideoAdapter;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -103,13 +116,41 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             {
                 ((TextView) rootView.findViewById(R.id.detail_text)).setText(mMovieStr);
             }*/
+        View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
+
+        // Calling the RecyclerView
+        mVideoRecyclerView = (RecyclerView) view.findViewById(R.id.video_recycler_view);
+        //mVideoRecyclerView.setHasFixedSize(true);
+
+        ArrayList<Videos> list = new ArrayList<>();
+        list.add(new Videos("id", "key", "name", "site", "size", "type"));
+        list.add(new Videos("id", "key", "name1", "site", "size", "type"));
+        list.add(new Videos("id", "key", "name2", "site", "size", "type"));
+
+        mVideoLayoutManager = new CustomLinearLayoutManager(getActivity());
+        mVideoRecyclerView.setScrollContainer(false);
+        mVideoRecyclerView.setLayoutManager(mVideoLayoutManager);
+        mVideoRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+        mVideoAdapter = new VideosRecyclerAdapter();
+
         Bundle arguments = getArguments();
         if (arguments != null) {
             mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
 
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        mVideoRecyclerView.setAdapter(mVideoAdapter);
+        mVideoAdapter.add(list.get(0), 0);
+        mVideoAdapter.add(list.get(1), 1);
+        mVideoAdapter.add(list.get(2), 2);
+        mVideoAdapter.notifyDataSetChanged();
+        return view;
     }
+
+
+
+
 
 
     /* Add the options menu to the fragment. */
@@ -266,6 +307,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         FetchVideo.execute(data.getString(COL_MOVIE_ID));
         FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity());
         FetchReview.execute(data.getString(COL_MOVIE_ID));
+
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActioProvider != null) {
