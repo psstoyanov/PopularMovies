@@ -360,34 +360,34 @@ public class PopularMoviesService extends IntentService {
                 cVVector.toArray(cvArray);
 
                 // Move to a cleaner function to clear the DB
-                int i = 0, k = 0;
-                Cursor testCursor = this.getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI,
-                        null, null,
-                        null, MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                if (testCursor.moveToFirst()) {
-                    int locationIdIndx = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                    String firstSortOrder =
-                            testCursor.getString(
-                                    locationIdIndx);
-                    while (testCursor.isAfterLast() == false) {
-                        //testCursor.moveToNext();
-                        int locationIdIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                        int theMovieId = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
-                        int locationIIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                        String currSort = testCursor.getString(locationIdIndex);
-                        if (testCursor.getLong(locationIdIndex) == sortorderID) {
-                            i++;
-                            // HELLLS YEAH!!!! FIXED THE DELETE FUNCTION!!!
-                            // USE THIS FOR THE FAVOURITES!!!!
-                            this.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI,
-                                    MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, null);
-                        } else k++;
-                        Log.d(LOG_TAG, testCursor.getString(locationIdIndex) + " the movie id " + testCursor.getString(theMovieId));
-                        testCursor.moveToNext();
-                    }
-                    Log.d(LOG_TAG, "the overall size of the cursor " + testCursor.getCount());
-                    Log.d(LOG_TAG, "all entries form sort 1 " + i + " from sort 2 " + k);
-                }
+                //int i = 0, k = 0;
+                //Cursor testCursor = this.getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI,
+                //        null, null,
+                //        null, MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                //if (testCursor.moveToFirst()) {
+                //    int locationIdIndx = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                //    String firstSortOrder =
+                //            testCursor.getString(
+                //                    locationIdIndx);
+                //    while (testCursor.isAfterLast() == false) {
+                //        //testCursor.moveToNext();
+                //        int locationIdIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                //        int theMovieId = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
+                //        int locationIIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
+                //        String currSort = testCursor.getString(locationIdIndex);
+                //        if (testCursor.getLong(locationIdIndex) == sortorderID) {
+                //            i++;
+                //            // HELLLS YEAH!!!! FIXED THE DELETE FUNCTION!!!
+                //            // USE THIS FOR THE FAVOURITES!!!!
+                //            this.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI,
+                //                    MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, null);
+                //        } else k++;
+                //        testCursor.moveToNext();
+                //    }
+                //    testCursor.close();
+                //    Log.d(LOG_TAG, "the overall size of the cursor " + testCursor.getCount());
+                //    Log.d(LOG_TAG, "all entries form sort 1 " + i + " from sort 2 " + k);
+                //}
                 inserted = this.getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
             }
 

@@ -7,6 +7,7 @@ package com.example.android.popularmovies;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -71,7 +72,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     // must change.
     //static final int COL_MOVIES_ID = 0;
     static final int COL_MOVIE_TITLE = 1;
-    //static final int COL_MOVIE_ID = 2;
+    static final int COL_MOVIE_ID = 2;
     static final int COL_OVERVIEW = 3;
     static final int COL_POSTER_PATH = 4;
     //static final int COL__SORT_SETTING = 5;
@@ -261,6 +262,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         ImageView movieBackdropView = (ImageView) getView().findViewById(R.id.detail_movie_backdrop);
         Picasso.with(getActivity()).load(movieBackdropImg).placeholder(R.drawable.blank_thumbnail)
                 .fit().centerInside().into(movieBackdropView);
+
+        FetchVideosAndReviewsTask FetchVideo= new FetchVideosAndReviewsTask(getActivity());
+        FetchVideo.execute("reviews",data.getString(COL_MOVIE_ID));
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActioProvider != null) {
