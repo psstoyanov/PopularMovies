@@ -15,17 +15,11 @@
  */
 package com.example.android.popularmovies;
 
-import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-
-import com.example.android.popularmovies.data.MoviesContract;
-import com.example.android.popularmovies.data.MoviesContract.MoviesEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,11 +31,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Vector;
 
-public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
+public class FetchVideosTask extends AsyncTask<String, Void, Void> {
 
-    private final String LOG_TAG = FetchVideosAndReviewsTask.class.getSimpleName();
+    private final String LOG_TAG = FetchVideosTask.class.getSimpleName();
 
     private GridAdapter mAdapter;
 
@@ -51,7 +44,7 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
     String movieID;
     String itemToReturn;
 
-    public FetchVideosAndReviewsTask(Context context) {
+    public FetchVideosTask(Context context) {
         mContext = context;
         //mAdapter = moviesAdapter;
     }
@@ -115,7 +108,7 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private Void getVideosReviewDataFromJson(String moviesdataJsonStr, String itemsToReturn)
+    private Void getVideosReviewDataFromJson(String moviesdataJsonStr)
             throws JSONException {
 
         // Now we have a String representing the complete forecast in JSON Format.
@@ -139,12 +132,6 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
         final String MDB_SITE = "site";
         final String MDB_SIZE = "size";
         final String MDB_TYPE = "type";
-
-        // For reviews
-        final String MDB_AUTHOR = "author";
-        final String MDB_CONTENT = "content";
-        final String MDB_URL = "url";
-        final String MDB_TOTAL_REVIEWS = "total_results";
 
 
         try {
@@ -170,49 +157,25 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
             // now we work exclusively in UTC
             //dayTime = new Time();
 
-            switch (itemsToReturn)
-            {
-                case "videos":
-                    for (int i = 0; i < movieArray.length(); i++)
-                    {
-                        String videoId;
-                        String videoKey;
-                        String videoName;
-                        String videoSite;
-                        String videoSize;
-                        String videoType;
 
-                        // Get the JSON object representing the video
-                        JSONObject movieObject = movieArray.getJSONObject(i);
+            for (int i = 0; i < movieArray.length(); i++) {
+                String videoId;
+                String videoKey;
+                String videoName;
+                String videoSite;
+                String videoSize;
+                String videoType;
 
-                        videoId = movieObject.getString(MDB_ID);
-                        videoKey = movieObject.getString(MDB_KEY);
-                        videoName = movieObject.getString(MDB_NAME);
-                        videoSite = movieObject.getString(MDB_SITE);
-                        videoSize = movieObject.getString(MDB_SIZE);
-                        videoType = movieObject.getString(MDB_TYPE);
-                        Log.d(LOG_TAG, videoId);
-                    }
-                    break;
-                case "reviews":
-                    for (int i = 0; i < movieArray.length(); i++)
-                    {
-                        String reviewId;
-                        String reviewAuthor;
-                        String reviewContent;
-                        String reviewUrl;
-                        // Get the JSON object representing the video
-                        JSONObject movieObject = movieArray.getJSONObject(i);
+                // Get the JSON object representing the video
+                JSONObject movieObject = movieArray.getJSONObject(i);
 
-                        reviewId = movieObject.getString(MDB_ID);
-                        reviewAuthor = movieObject.getString(MDB_AUTHOR);
-                        reviewContent = movieObject.getString(MDB_CONTENT);
-                        reviewUrl = movieObject.getString(MDB_URL);
-                        Log.d(LOG_TAG, reviewContent);
-                    }
-                    String totalReviews = moviesdataJson.getString(MDB_TOTAL_REVIEWS);
-                    Log.d(LOG_TAG, totalReviews);
-                    break;
+                videoId = movieObject.getString(MDB_ID);
+                videoKey = movieObject.getString(MDB_KEY);
+                videoName = movieObject.getString(MDB_NAME);
+                videoSite = movieObject.getString(MDB_SITE);
+                videoSize = movieObject.getString(MDB_SIZE);
+                videoType = movieObject.getString(MDB_TYPE);
+                Log.d(LOG_TAG, videoId);
             }
 
             /*// Sort order:  Ascending, by date.
@@ -265,11 +228,10 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
     protected Void doInBackground(String... params) {
 
         // If there's no zip code, there's nothing to look up.  Verify size of params.
-        if (params.length <= 1) {
+        if (params.length == 0) {
             return null;
         }
-        String itemsToReturn = params[0];
-        String movieId = params[1];
+        String movieId = params[0];
 
         /* By default, the first page of results will be shown.
             *  TheMovieDB API displays 20 results per page.
@@ -292,7 +254,7 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
                     "http://api.themoviedb.org/3/movie/";
             final String KEY_PARAM = "api_key";
 
-            Uri builtUri = Uri.parse(MOVIE_BASE_URL + movieId + "/" + itemsToReturn).buildUpon()
+            Uri builtUri = Uri.parse(MOVIE_BASE_URL + movieId + "/" + "videos").buildUpon()
                     .appendQueryParameter(KEY_PARAM, Constans.MOVIEDB_API_KEY)
                     .build();
 
@@ -325,7 +287,7 @@ public class FetchVideosAndReviewsTask extends AsyncTask<String, Void, Void> {
                 return null;
             }
             moviedbJsonStr = buffer.toString();
-            getVideosReviewDataFromJson(moviedbJsonStr, itemsToReturn);
+            getVideosReviewDataFromJson(moviedbJsonStr);
             //Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
 
         } catch (IOException e) {
