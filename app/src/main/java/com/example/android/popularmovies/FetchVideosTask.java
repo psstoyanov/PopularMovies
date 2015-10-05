@@ -45,13 +45,9 @@ public class FetchVideosTask extends AsyncTask<String, Void, ArrayList<Videos>> 
     //private ArrayAdapter<String> mVideosAdapter;
     private final Context mContext;
 
-    String movieID;
-    String itemToReturn;
-
     public FetchVideosTask(Context context,VideosRecyclerAdapter videoadapter) {
         mContext = context;
         mVideosAdapter = videoadapter;
-        //mAdapter = moviesAdapter;
     }
 
     private boolean DEBUG = true;

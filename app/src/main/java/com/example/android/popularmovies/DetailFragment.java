@@ -28,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.Adapters.ReviewsRecyclerAdapter;
 import com.example.android.popularmovies.Adapters.VideosRecyclerAdapter;
 import com.example.android.popularmovies.ObjectModel.Videos;
 import com.example.android.popularmovies.Utils.CustomLinearLayoutManager;
@@ -92,9 +93,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     static final int COL_TAGLINE = 9;
     static final int COL_BACKDROP_IMG = 10;
 
+    // The videos recycler view.
     RecyclerView mVideoRecyclerView;
     RecyclerView.LayoutManager mVideoLayoutManager;
     VideosRecyclerAdapter mVideoAdapter;
+
+    // The reviews recycler view.
+
+    RecyclerView mReviewsRecyclerView;
+    RecyclerView.LayoutManager mReviewsLayoutManager;
+    ReviewsRecyclerAdapter mReviewsAdapter;
 
     public DetailFragment() {
         setHasOptionsMenu(true);
@@ -119,21 +127,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
 
-        // Calling the RecyclerView
+        // Calling the RecyclerViews
         mVideoRecyclerView = (RecyclerView) view.findViewById(R.id.video_recycler_view);
+        mReviewsRecyclerView = (RecyclerView) view.findViewById(R.id.reviews_recycler_view);
         //mVideoRecyclerView.setHasFixedSize(true);
-
-        ArrayList<Videos> list = new ArrayList<>();
-        list.add(new Videos("id", "key", "name", "site", "size", "type"));
-        list.add(new Videos("id", "key", "name1", "site", "size", "type"));
-        list.add(new Videos("id", "key", "name2", "site", "size", "type"));
 
         mVideoLayoutManager = new CustomLinearLayoutManager(getActivity());
         mVideoRecyclerView.setScrollContainer(false);
         mVideoRecyclerView.setLayoutManager(mVideoLayoutManager);
         mVideoRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        mReviewsLayoutManager = new CustomLinearLayoutManager(getActivity());
+        mReviewsRecyclerView.setScrollContainer(false);
+        mReviewsRecyclerView.setLayoutManager(mReviewsLayoutManager);
+
         mVideoAdapter = new VideosRecyclerAdapter(getActivity());
+        mReviewsAdapter = new ReviewsRecyclerAdapter(getActivity());
 
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -141,6 +150,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         mVideoRecyclerView.setAdapter(mVideoAdapter);
+        mReviewsRecyclerView.setAdapter(mReviewsAdapter);
 
         return view;
     }
@@ -302,7 +312,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         FetchVideosTask FetchVideo= new FetchVideosTask(getActivity(),mVideoAdapter);
         FetchVideo.execute(data.getString(COL_MOVIE_ID));
-        FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity());
+
+        TextView ReviewsButton = (TextView)getView().findViewById(R.id.reviews_button);
+
+
+        FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity(),mReviewsAdapter);
         FetchReview.execute(data.getString(COL_MOVIE_ID));
 
 

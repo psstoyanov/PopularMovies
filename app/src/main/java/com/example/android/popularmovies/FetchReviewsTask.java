@@ -21,6 +21,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
+import com.example.android.popularmovies.Adapters.ReviewsRecyclerAdapter;
+import com.example.android.popularmovies.ObjectModel.Reviews;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,22 +34,22 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
-public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
+public class FetchReviewsTask extends AsyncTask<String, Void, ArrayList<Reviews>> {
 
     private final String LOG_TAG = FetchReviewsTask.class.getSimpleName();
 
-    private GridAdapter mAdapter;
+    private ReviewsRecyclerAdapter mReviewsAdapter;
 
-    private ArrayAdapter<String> mMoviesAdapter;
     private final Context mContext;
 
     String movieID;
     String itemToReturn;
 
-    public FetchReviewsTask(Context context) {
+    public FetchReviewsTask(Context context, ReviewsRecyclerAdapter reviewsAdapter) {
         mContext = context;
-        //mAdapter = moviesAdapter;
+        mReviewsAdapter = reviewsAdapter;
     }
 
     private boolean DEBUG = true;
@@ -108,8 +111,11 @@ public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private Void getReviewDataFromJson(String moviesdataJsonStr)
+    private ArrayList<Reviews> getReviewDataFromJson(String moviesdataJsonStr)
             throws JSONException {
+
+        // The ArrayList of Videos to be returned.
+        ArrayList<Reviews> reivewsToReturn = new ArrayList<>();
 
         // Now we have a String representing the complete forecast in JSON Format.
         // Fortunately parsing is easy:  constructor takes the JSON string and converts it
@@ -125,13 +131,6 @@ public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
         final String MDB_RESULTS = "results";
 
         final String MDB_ID = "id";
-
-        // For videos
-        final String MDB_KEY = "key";
-        final String MDB_NAME = "name";
-        final String MDB_SITE = "site";
-        final String MDB_SIZE = "size";
-        final String MDB_TYPE = "type";
 
         // For reviews
         final String MDB_AUTHOR = "author";
@@ -177,10 +176,16 @@ public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
                         reviewAuthor = movieObject.getString(MDB_AUTHOR);
                         reviewContent = movieObject.getString(MDB_CONTENT);
                         reviewUrl = movieObject.getString(MDB_URL);
+                        Reviews reviewToAdd = new Reviews(reviewId,
+                                reviewAuthor,
+                                reviewContent,
+                                reviewUrl);
+                        reivewsToReturn.add(reviewToAdd);
                         Log.d(LOG_TAG, reviewContent);
                     }
                     String totalReviews = moviesdataJson.getString(MDB_TOTAL_REVIEWS);
                     Log.d(LOG_TAG, totalReviews);
+            return reivewsToReturn;
 
 
             /*// Sort order:  Ascending, by date.
@@ -230,7 +235,7 @@ public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(String... params) {
+    protected ArrayList<Reviews> doInBackground(String... params) {
 
         // If there's no zip code, there's nothing to look up.  Verify size of params.
         if (params.length == 0) {
@@ -292,7 +297,8 @@ public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
                 return null;
             }
             moviedbJsonStr = buffer.toString();
-            getReviewDataFromJson(moviedbJsonStr);
+            ArrayList<Reviews> reviewsToReturn = getReviewDataFromJson(moviedbJsonStr);
+            return reviewsToReturn;
             //Log.v(LOG_TAG, "MovieDB Json Str: " + moviedbJsonStr);
 
         } catch (IOException e) {
@@ -325,16 +331,16 @@ public class FetchReviewsTask extends AsyncTask<String, Void, Void> {
         return null;
     }
 
-    /*@Override
-    protected void onPostExecute(String[] result) {
-        if (result != null && mMoviesAdapter != null) {
-            mMoviesAdapter.clear();
-            for(String dayForecastStr : result) {
-                mMoviesAdapter.add(dayForecastStr);
+    @Override
+    protected void onPostExecute(ArrayList<Reviews> result) {
+        if (result != null && mReviewsAdapter != null) {
+            mReviewsAdapter.clear();
+            for(Reviews reviewObject : result) {
+                mReviewsAdapter.add(reviewObject);
             }
             // New data is back from the server.  Hooray!
         }
-    }*/
+    }
     /*@Override
     protected void onPostExecute(PopularMovieGridItem[] results)
     {
