@@ -35,6 +35,11 @@
     <!-- Sort order preference by favorite value -->
     <string name="pref_order_favorite">favorite</string>
 
+    <!-- Account type (for sync-adapter authenticator) -->
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">popularmovies.example.com</string>
+    <string name="content_authority">com.example.android.popularmovies</string>
+
     
 
 

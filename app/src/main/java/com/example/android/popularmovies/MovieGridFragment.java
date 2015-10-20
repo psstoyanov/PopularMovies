@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 
 import com.example.android.popularmovies.data.MoviesContract;
 import com.example.android.popularmovies.services.PopularMoviesService;
+import com.example.android.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -170,18 +171,20 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         //String sortOrder = Utility.getPreferredSortOrder(getActivity());
         //movieTask.execute(sortOrder);
 
-        Intent alarmIntent = new Intent(getActivity(),PopularMoviesService.AlarmReceiver.class);
-        alarmIntent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
-                Utility.getPreferredSortOrder(getActivity()));
+        //Intent alarmIntent = new Intent(getActivity(),PopularMoviesService.AlarmReceiver.class);
+        //alarmIntent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
+        //        Utility.getPreferredSortOrder(getActivity()));
 
         //Wrap in a pending intent which only fires once.
-        PendingIntent pi = PendingIntent.getBroadcast(getActivity(),0,
-                alarmIntent,PendingIntent.FLAG_ONE_SHOT);
+        //PendingIntent pi = PendingIntent.getBroadcast(getActivity(),0,
+        //        alarmIntent,PendingIntent.FLAG_ONE_SHOT);
         //getBroadcast(context, 0, i, 0);
 
-        AlarmManager am=(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+        //AlarmManager am=(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
         //Set the AlarmManager to wake up the system.
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pi);
+        //am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pi);
+
+        PopularMoviesSyncAdapter.syncImmediately(getActivity());
 
     }
 

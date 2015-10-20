@@ -74,8 +74,8 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder> {
         //Also changed how the view itself will handle it.
         Picasso.with(viewHolder.imgThumbnail.getContext())
                 .load(movielist.getThumbnail())
-                .placeholder(R.drawable.blank_thumbnail).
-                fit().centerInside().into(viewHolder.imgThumbnail);
+                .placeholder(R.drawable.blank_thumbnail)
+                .fit().into(viewHolder.imgThumbnail);
         if (cursor.getPosition() == mSelectedItem) {
             viewHolder.itemView.findViewById(R.id.top_layout).setActivated(true);
         } else {

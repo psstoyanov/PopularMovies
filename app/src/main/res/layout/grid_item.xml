@@ -38,10 +38,11 @@
                     android:id="@+id/img_thumbnail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="5dp"
-                    android:scaleType="centerCrop" />
+                    android:scaleType="centerInside" />
 
                 <RelativeLayout
                     android:id="@+id/bottom_layout"
