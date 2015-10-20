@@ -48,9 +48,6 @@
             android:name=".data.MoviesProvider"
             android:syncable="true"
             android:exported="false"/>
-        <service android:name=".services.PopularMoviesService"/>
-        <receiver android:name=".services.PopularMoviesService$AlarmReceiver"
-            android:enabled="true"/>
         <!-- SyncAdapter's dummy authentication service -->
         <service
             android:name=".sync.PopularMoviesAuthenticatorService"

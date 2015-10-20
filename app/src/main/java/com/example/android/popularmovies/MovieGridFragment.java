@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.android.popularmovies.data.MoviesContract;
-import com.example.android.popularmovies.services.PopularMoviesService;
 import com.example.android.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**

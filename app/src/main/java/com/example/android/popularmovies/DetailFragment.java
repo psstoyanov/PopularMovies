@@ -36,7 +36,6 @@ import com.example.android.popularmovies.Adapters.VideosRecyclerAdapter;
 import com.example.android.popularmovies.ObjectModel.Videos;
 import com.example.android.popularmovies.Utils.CustomLinearLayoutManager;
 import com.example.android.popularmovies.data.MoviesContract;
-import com.example.android.popularmovies.services.PopularMoviesService;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

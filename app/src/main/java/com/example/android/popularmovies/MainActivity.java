@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.android.popularmovies.sync.PopularMoviesSyncAdapter;
+
 public class MainActivity extends AppCompatActivity implements MovieGridFragment.Callback {
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
@@ -120,5 +122,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
                     .setData(contentUri);
             startActivity(intent);
         }
+
+        PopularMoviesSyncAdapter.initializeSyncAdapter(this);
     }
 }
