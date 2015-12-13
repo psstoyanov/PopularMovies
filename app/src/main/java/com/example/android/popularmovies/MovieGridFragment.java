@@ -96,7 +96,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         super.onCreate(savedInstanceState);
         // Add this line in order for this fragment to handle menu events.
         setHasOptionsMenu(true);
-        //Log.d(LOG_TAG, " onCreate");
     }
 
     @Override
@@ -123,20 +122,12 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
             if (savedInstanceState.containsKey(SELECTED_KEY)) {
                 mAdapter.setmSelectedItem(savedInstanceState.getInt(SELECTED_KEY));
-                //mRecyclerView.smoothScrollToPosition(savedInstanceState.getInt(SELECTED_KEY));
             }
-            Log.d(LOG_TAG, " onCreateView restore instance");
         } else {
             updateMovieData();
-            Log.d(LOG_TAG, " onCreateView restore instance null");
         }
 
-        //Log.d(LOG_TAG, String.valueOf(mRecyclerView.getResources()));
-
-
         mRecyclerView.setAdapter(mAdapter);
-
-        Log.d(LOG_TAG, " onCreateView");
         return view;
     }
 
@@ -162,37 +153,13 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
 
     private void updateMovieData() {
-        //FetchMovieTask movieTask = new FetchMovieTask(getActivity());
-        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        //String sortorder = prefs.getString(getString(R.string.pref_sort_key),
-        //        getString(R.string.pref_order_popularity));
-        //Log.d(LOG_TAG, " updateMovieData");
-        //String sortOrder = Utility.getPreferredSortOrder(getActivity());
-        //movieTask.execute(sortOrder);
-
-        //Intent alarmIntent = new Intent(getActivity(),PopularMoviesService.AlarmReceiver.class);
-        //alarmIntent.putExtra(PopularMoviesService.SORT_ORDER_QUERY_EXTRA,
-        //        Utility.getPreferredSortOrder(getActivity()));
-
-        //Wrap in a pending intent which only fires once.
-        //PendingIntent pi = PendingIntent.getBroadcast(getActivity(),0,
-        //        alarmIntent,PendingIntent.FLAG_ONE_SHOT);
-        //getBroadcast(context, 0, i, 0);
-
-        //AlarmManager am=(AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
-        //Set the AlarmManager to wake up the system.
-        //am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pi);
-
         PopularMoviesSyncAdapter.syncImmediately(getActivity());
-
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         getLoaderManager().initLoader(DISCOVER_MOVIES_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
-
-        //Log.d(LOG_TAG, " onActivityCreated");
     }
 
 
@@ -226,7 +193,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             outState.putInt(SELECTED_KEY, mAdapter.getmSelectedItem());
         }
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, mRecyclerView.getLayoutManager().
-                        onSaveInstanceState()
+                onSaveInstanceState()
         );
         super.onSaveInstanceState(outState);
     }
@@ -238,7 +205,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
         // when returning from the SettingsActivity with the system back button
         // instead of the back button in the app bar.
         getLoaderManager().initLoader(0, null, this);
-        Log.d(LOG_TAG, " onStart");
     }
 
     @Override
@@ -261,7 +227,6 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, final Cursor cursor) {
-        //mForecastAdapter.swapCursor(cursor);
         mAdapter.swapCursor(cursor);
 
         if (mAdapter.getmSelectedItem() != -1) {
@@ -270,8 +235,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.smoothScrollToPosition(mAdapter.getmSelectedItem());
         }
         //In case we have two pane layout, we want to load the first item.
-        else if (cursor != null && mUseTwoPaneBeginLayout)
-        {
+        else if (cursor != null && mUseTwoPaneBeginLayout) {
 
             // Check if the adapter is empty
             // and if the adapter has all items from the cursor
@@ -279,8 +243,8 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
             // Otherwise, the app will crash when first loaded
             // as the tables are empty.
             if (mAdapter.getItemCount() == cursor.getCount() &&
-                    mAdapter.getItemCount()> 0 )
-            {
+                    mAdapter.getItemCount() > 0) {
+
                 mAdapter.notifyDataSetChanged();
                 // Create a new runnable to perform the click event.
                 // Caution! When using the system back
@@ -288,7 +252,7 @@ public class MovieGridFragment extends Fragment implements LoaderManager.LoaderC
                     @Override
                     public void run() {
                         if (cursor.moveToFirst())
-                        mAdapter.setClickSelect(getActivity(), cursor, 0);
+                            mAdapter.setClickSelect(getActivity(), cursor, 0);
                     }
                 };
                 // Launch a new thread to perform the action.

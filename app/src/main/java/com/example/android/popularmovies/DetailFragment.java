@@ -249,7 +249,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(Loader<Cursor> loader, final Cursor data) {
         Log.v(LOG_TAG, "In onLoadFinished");
         if (!data.moveToFirst()) {
             return;
@@ -330,6 +330,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         TextView ReviewsButton = (TextView)getView().findViewById(R.id.reviews_button);
 
+        // Add an onClick listener to force fetch the reviews.
+        // Also prevents the app from crashing.
+        ReviewsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(LOG_TAG, "Reviews textview clicked.");
+                FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity(),mReviewsAdapter);
+                FetchReview.execute(data.getString(COL_MOVIE_ID));
+            }
+        });
+
 
         FetchReviewsTask FetchReview= new FetchReviewsTask(getActivity(),mReviewsAdapter);
         FetchReview.execute(data.getString(COL_MOVIE_ID));
@@ -391,6 +402,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (mShareActioProvider != null) {
             mShareActioProvider.setShareIntent(createShareMovieIntent());
         }
+
+
 
     }
 

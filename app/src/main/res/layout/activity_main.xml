@@ -4,5 +4,5 @@ android:id="@+id/fragment_moviegrid"
 android:name="com.example.android.popularmovies.MovieGridFragment"
 android:layout_width="match_parent"
 android:layout_height="match_parent"
-tools:context="com.example.android.sunshine.app.ForecastFragment"
+tools:context="com.example.android.popularmovies.MainActivity"
 tools:layout="@android:layout/list_content" />

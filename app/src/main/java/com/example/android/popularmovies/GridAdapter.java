@@ -69,10 +69,12 @@ public class GridAdapter extends CursorRecyclerAdapter<GridAdapter.ViewHolder> {
         //viewHolder.imgThumbnail.setImageResource(movielist.getThumbnail());
 
         //Use psso to load an image.
-        Picasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
+        Picasso mPicasso = Picasso.with(viewHolder.imgThumbnail.getContext());
+        mPicasso.setIndicatorsEnabled(true);
+        mPicasso.with(viewHolder.imgThumbnail.getContext()).cancelRequest(viewHolder.imgThumbnail);
         //Add a fit and center function from Picasso
         //Also changed how the view itself will handle it.
-        Picasso.with(viewHolder.imgThumbnail.getContext())
+        mPicasso.with(viewHolder.imgThumbnail.getContext())
                 .load(movielist.getThumbnail())
                 .placeholder(R.drawable.blank_thumbnail)
                 .fit().into(viewHolder.imgThumbnail);

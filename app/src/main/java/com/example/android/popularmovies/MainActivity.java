@@ -2,6 +2,9 @@ package com.example.android.popularmovies;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -49,11 +52,7 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
         // in the DetailFragment when the data is finished loading.
         movieGridFragment.setUseTwoPaneBeginLayout(mTwoPane);
 
-        /*if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().
-                    add(R.id.fragment_moviegrid, new MovieGridFragment(), DISCOVERMOVIEGRIDFRAGMENT_TAG)
-                    .commit();
-        }*/
+
     }
 
 
@@ -107,16 +106,27 @@ public class MainActivity extends AppCompatActivity implements MovieGridFragment
             // In two-pane mode, show the detail view in this activity by
             // adding or replacing the detail fragment using a
             // fragment transaction.
-            Bundle args = new Bundle();
+            final Bundle args = new Bundle();
             args.putParcelable(DetailFragment.DETAIL_URI, contentUri);
 
-            DetailFragment fragment = new DetailFragment();
+            final DetailFragment fragment = new DetailFragment();
             fragment.setArguments(args);
 
 
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.movie_detail_container, fragment, DETAILMOVIEFRAGMENT_TAG)
-                    .commit();
+            final int WHAT = 1;
+            // Add the Looper.getMainLooper so that the handler can run.
+            Handler handler = new Handler(Looper.getMainLooper()){
+                @Override
+                public void handleMessage(Message msg)
+                {
+                    if(msg.what == WHAT) getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.movie_detail_container, fragment, DETAILMOVIEFRAGMENT_TAG)
+                            .commit();
+                }
+            };
+            handler.sendEmptyMessage(WHAT);
+
+
         } else {
             Intent intent = new Intent(this, DetailActivity.class)
                     .setData(contentUri);

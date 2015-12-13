@@ -2,24 +2,37 @@ package com.example.android.popularmovies.sync;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
+import android.widget.ImageView;
 
 import com.example.android.popularmovies.Constans;
+import com.example.android.popularmovies.MainActivity;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.Utility;
 import com.example.android.popularmovies.data.MoviesContract;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +51,28 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in milliseconds.
 // 60 seconds (1 minute) * 180 = 3 hours
     public static final int SYNC_INTERVAL = 60 * 180;
-    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
+
+    private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
+    private static final int MOVIES_NOTIFICATION_ID = 3004;
+
+    private static final String[] DISCOVER_MOVIES_COLUMNS = new String[]{
+            // In this case the id needs to be fully qualified with a table name, since
+            // the content provider joins the location & weather tables in the background
+            // (both have an _id column)
+            // On the one hand, that's annoying.  On the other, you can search the weather table
+            // using the location set by the user, which is only in the Location table.
+            // So the convenience is worth it.
+            MoviesContract.MoviesEntry.TABLE_NAME + "." + MoviesContract.MoviesEntry._ID,
+            MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE,
+            MoviesContract.MoviesEntry.COLUMN_POSTER_PATH
+    };
+    // These indices are tied to DISCOVER_MOVIES_COLUMNS.  If DISCOVER_MOVIES_COLUMNS changes, these
+    // must change.
+    //static final int COL_MOVIES_ID = 0;
+    static final int COL_MOVIE_TITLE = 1;
+    static final int COL_POSTER_PATH = 2;
+
 
     public final String LOG_TAG = PopularMoviesSyncAdapter.class.getSimpleName();
 
@@ -51,8 +85,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(LOG_TAG, "onPerformSync Called.");
 
         String sortQuery = Utility.getPreferredSortOrder(getContext());
-        if (sortQuery == "favorite")
-        {
+        if (sortQuery == "favorite") {
             long sortorderID = addsortOrder(sortQuery);
             return;
         }
@@ -138,6 +171,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
     }
+
     private JSONObject fetchAdditionalMovieData(int movieId) {
 
         // These two need to be declared outside the try/catch
@@ -246,10 +280,10 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
         final String MDB_VOTE_AVARAGE = "vote_average";
         final String MDB_ID = "id";
 
-        final String MDB_EXTRA_BACKDROP_IMG  = "backdrop_path";
-        final String MDB_EXTRA_HOMEPAGE  = "homepage";
-        final String MDB_EXTRA_RUNTIME  = "runtime";
-        final String MDB_EXTRA_TAGLINE  = "tagline";
+        final String MDB_EXTRA_BACKDROP_IMG = "backdrop_path";
+        final String MDB_EXTRA_HOMEPAGE = "homepage";
+        final String MDB_EXTRA_RUNTIME = "runtime";
+        final String MDB_EXTRA_TAGLINE = "tagline";
 
         try {
             JSONObject moviesdataJson = new JSONObject(moviesdataJsonStr);
@@ -348,7 +382,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_SORT_KEY, sortorderID);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE, movie_title);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, movie_id);
-                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE,movie_tagline);
+                moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_TAGLINE, movie_tagline);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_OVERVIEW, movie_overview);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_POSTER_PATH, movie_thumbnail);
                 moviesValues.put(MoviesContract.MoviesEntry.COLUMN_MOVIE_BACKDROP_IMG, movie_backdrop);
@@ -363,48 +397,89 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // add to database
             if (cVVector.size() > 0) {
-                //Log.d(LOG_TAG, String.valueOf(cVVector.size()));
-                // Student: call bulkInsert to add the weatherEntries to the database here
+
                 ContentValues[] cvArray = new ContentValues[cVVector.size()];
                 cVVector.toArray(cvArray);
 
-                // Move to a cleaner function to clear the DB
-                //int i = 0, k = 0;
-                //Cursor testCursor = this.getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI,
-                //        null, null,
-                //        null, MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                //if (testCursor.moveToFirst()) {
-                //    int locationIdIndx = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                //    String firstSortOrder =
-                //            testCursor.getString(
-                //                    locationIdIndx);
-                //    while (testCursor.isAfterLast() == false) {
-                //        //testCursor.moveToNext();
-                //        int locationIdIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                //        int theMovieId = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_TITLE);
-                //        int locationIIndex = testCursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_SORT_KEY);
-                //        String currSort = testCursor.getString(locationIdIndex);
-                //        if (testCursor.getLong(locationIdIndex) == sortorderID) {
-                //            i++;
-                //            // HELLLS YEAH!!!! FIXED THE DELETE FUNCTION!!!
-                //            // USE THIS FOR THE FAVOURITES!!!!
-                //            this.getContentResolver().delete(MoviesContract.MoviesEntry.CONTENT_URI,
-                //                    MoviesContract.MoviesEntry.COLUMN_MOVIE_ID, null);
-                //        } else k++;
-                //        testCursor.moveToNext();
-                //    }
-                //    testCursor.close();
-                //    Log.d(LOG_TAG, "the overall size of the cursor " + testCursor.getCount());
-                //    Log.d(LOG_TAG, "all entries form sort 1 " + i + " from sort 2 " + k);
-                //}
+
                 inserted = getContext().getContentResolver().bulkInsert(MoviesContract.MoviesEntry.CONTENT_URI, cvArray);
+                notifyMovies();
             }
 
             //Log.d(LOG_TAG, "FetchWeatherTask Complete. " + inserted + " Inserted");
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private void notifyMovies() throws IOException {
+
+        Context context = getContext();
+        //checking the last update and notify if it' the first of the day
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String lastNotificationKey = context.getString(R.string.pref_last_notification);
+        long lastSync = prefs.getLong(lastNotificationKey, 0);
+
+        if (System.currentTimeMillis() - lastSync >= DAY_IN_MILLIS) {
+            // Last sync was more than 1 day ago, let's send a notification with the weather.
+            String sortQuery = Utility.getPreferredSortOrder(context);
+
+            Uri moviesUri = MoviesContract.MoviesEntry.buildMoviesSortorder(sortQuery);
+
+
+
+
+            // we'll query our contentProvider, as always
+            Cursor cursor = context.getContentResolver().query(moviesUri, DISCOVER_MOVIES_COLUMNS, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                String movietitle = cursor.getString(COL_MOVIE_TITLE);
+                String moviePoster = cursor.getString(COL_POSTER_PATH);
+
+                String title = context.getString(R.string.app_name);
+
+
+                //build your notification here.
+                // NotificationCompatBuilder is a very convenient way to build backward-compatible
+                // notifications.  Just throw in some data.
+                NotificationCompat.Builder mBuilder =
+                        new NotificationCompat.Builder(getContext())
+                                .setSmallIcon(R.drawable.notification_template_icon_bg)
+                                .setContentTitle(title)
+                                .setContentText(movietitle);
+
+                // Make something interesting happen when the user clicks on the notification.
+                // In this case, opening the app is sufficient.
+                Intent resultIntent = new Intent(context, MainActivity.class);
+
+                // The stack builder object will contain an artificial back stack for the
+                // started Activity.
+                // This ensures that navigating backward from the Activity leads out of
+                // your application to the Home screen.
+                TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+                stackBuilder.addNextIntent(resultIntent);
+                PendingIntent resultPendingIntent =
+                        stackBuilder.getPendingIntent(
+                                0,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+                mBuilder.setContentIntent(resultPendingIntent);
+
+                NotificationManager mNotificationManager =
+                        (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                // WEATHER_NOTIFICATION_ID allows you to update the notification later on.
+                mNotificationManager.notify(MOVIES_NOTIFICATION_ID, mBuilder.build());
+
+                //refreshing last sync
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putLong(lastNotificationKey, System.currentTimeMillis());
+                editor.commit();
+            }
+        }
+
     }
 
     /**
@@ -459,6 +534,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Helper method to have the sync adapter sync immediately
+     *
      * @param context The context used to access the account service
      */
     public static void syncImmediately(Context context) {
@@ -536,7 +612,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
 
         // If the password doesn't exist, the account doesn't exist
-        if ( null == accountManager.getPassword(newAccount) ) {
+        if (null == accountManager.getPassword(newAccount)) {
 
         /*
          * Add the account and account type, no password or user data
